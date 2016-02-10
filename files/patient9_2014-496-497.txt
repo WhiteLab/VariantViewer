@@ -1,0 +1,118 @@
+chr	pos	ref	alt	Func.refGene	Gene.refGene	GeneDetail.refGene	ExonicFunc.refGene	AAChange.refGene	normal_ref_count	normal_alt_count	%_normal_alt	normal_genotype	tumor_ref_count	tumor_alt_count	%_tumor_alt	tumor_genotype	pvalue_call
+chr6	41654006	G	T	intronic	TFEB:-				101	0	0%	G	49	5	9.26%	K	0.0045
+chr16	10273765	C	A	intronic	GRIN2A:-				104	1	0.95%	C	63	7	10%	M	0.0073
+chr19	11096723	C	A	intronic	SMARCA4:+				106	0	0%	C	49	3	5.77%	M	0.0343
+chr13	48939215	G	T	intronic	RB1:+				106	0	0%	G	58	4	6.45%	K	0.0174
+chr3	142215728	C	A	intronic	ATR:-				107	0	0%	C	45	3	6.25%	M	0.0284
+chr17	9862745	G	T	UTR5	GAS7:-	NM_003644:c.-122C>A			108	0	0%	G	61	4	6.15%	K	0.0188
+chr14	51245423	T	A	intronic	NIN:-				108	0	0%	T	46	3	6.12%	W	0.0291
+chr11	46337990	C	T	intronic	CREB3L1:+				112	0	0%	C	46	4	8%	Y	0.0083
+chr16	56973285	G	T	intronic	HERPUD1:+				112	0	0%	G	66	4	5.71%	K	0.0207
+chr1	204495666	A	T	intronic	MDM4:+				113	0	0%	A	61	4	6.15%	W	0.0167
+chr17	5286552	G	T	UTR3	RABEP1:+	NM_001083585:c.*34G>T,NM_004703:c.*34G>T,NM_001291581:c.*34G>T			114	0	0%	G	50	4	7.41%	K	0.0099
+chr1	45307798	G	T	intronic	PTCH2:-				114	1	0.87%	G	56	6	9.68%	K	0.0079
+chr6	167439945	C	A	intronic	FGFR1OP:+				117	0	0%	C	61	3	4.69%	M	0.0429
+chr1	145541542	G	T	intronic	ITGA10:+,NBPF10:+,NBPF20:+				121	0	0%	G	63	4	5.97%	K	0.0152
+chr6	152464960	A	T	intronic	SYNE1:-				122	0	0%	A	69	4	5.48%	W	0.0186
+chr16	11004149	G	T	intronic	CIITA:+				122	0	0%	G	67	5	6.94%	K	0.0064
+chrX	52809626	C	A	intergenic	SSX2,SPANXN5	dist=19009;dist=15560			125	0	0%	C	85	4	4.49%	M	0.0287
+chr21	44524301	T	A	intronic	U2AF1:-				125	0	0%	T	47	3	6%	W	0.0223
+chr11	128782155	G	T	intronic	KCNJ5:+				126	0	0%	G	59	4	6.35%	K	0.0116
+chr13	28971346	G	T	intronic	FLT1:-				129	0	0%	G	59	4	6.35%	K	0.0109
+chr17	37563594	T	A	UTR3	MED1:-	NM_004774:c.*134A>T			129	0	0%	T	79	6	7.06%	W	0.0035
+chr7	61967252	A	G	intergenic	NONE,ZNF733P	dist=NONE;dist=784418			13	0	0%	A	9	5	35.71%	R	0.0248
+chr3	195599186	T	G	exonic	TNK2:-		nonsynonymous SNV	TNK2:NM_001010938:exon10:c.A1601C:p.D534A,TNK2:NM_005781:exon10:c.A1412C:p.D471A	13	0	0%	T	18	10	35.71%	K	0.0117
+chr16	89882196	G	A	intronic	FANCA:-				132	1	0.75%	G	88	7	7.37%	R	0.0099
+chr4	103498239	G	T	intronic	NFKB1:+				136	0	0%	G	84	5	5.62%	K	0.009
+chr1	150786767	G	T	intronic	ARNT:-				141	0	0%	G	75	4	5.06%	K	0.0158
+chr5	131310398	T	A	intronic	ACSL6:-				141	0	0%	T	72	3	4%	W	0.0408
+chr5	131324636	A	G	intronic	ACSL6:-				143	0	0%	A	84	4	4.55%	R	0.0202
+chr20	54958357	G	T	intronic	AURKA:-				146	0	0%	G	54	4	6.90%	K	0.0061
+chr15	66774359	G	T	intronic	MAP2K1:+				146	0	0%	G	69	3	4.17%	K	0.035
+chr17	41196891	G	T	UTR3	BRCA1:-	NM_007300:c.*804C>A,NM_007298:c.*804C>A,NM_007297:c.*804C>A,NM_007294:c.*804C>A,NM_007299:c.*910C>A			148	0	0%	G	51	3	5.56%	K	0.0183
+chr7	2977824	G	T	intronic	CARD11:-				148	2	1.33%	G	45	6	11.76%	K	0.0038
+chr1	45291812	C	A	intronic	PTCH2:-				151	0	0%	C	63	3	4.55%	M	0.0272
+chr7	91711825	C	A	intronic	AKAP9:+				151	0	0%	C	81	5	5.81%	M	0.0058
+chr8	9624033	G	T	intronic	TNKS:+				154	2	1.28%	G	79	8	9.20%	K	0.0048
+chr8	103297221	C	A	intronic	UBR5:-				159	1	0.62%	C	61	6	8.96%	M	0.003
+chr13	113965202	C	T	intronic	LAMP1:+				160	0	0%	C	93	5	5.10%	Y	0.0074
+chr12	132479329	T	A	intronic	EP400:+				161	0	0%	T	66	4	5.71%	W	0.0079
+chr5	86682502	C	A	intronic	RASA1:+				162	0	0%	C	89	4	4.30%	M	0.017
+chr5	86672117	C	A	intronic	RASA1:+				163	0	0%	C	66	3	4.35%	M	0.0255
+chr18	45397087	G	T	intronic	SMAD2:-				165	0	0%	G	58	4	6.45%	K	0.0052
+chr20	39795599	G	T	intronic	PLCG1:+				167	0	0%	G	87	5	5.43%	K	0.0053
+chr17	40497893	C	T	intronic	STAT3:-				17	0	0%	C	6	3	33.33%	Y	0.0323
+chr5	131326523	C	A	intronic	ACSL6:-				17	1	5.56%	C	7	7	50%	M	0.0062
+chr1	186287496	C	A	ncRNA_intronic	MIR548F1:-				175	0	0%	C	66	4	5.71%	M	0.0063
+chr19	10599809	C	A	intronic	KEAP1:-				175	2	1.13%	C	98	9	8.41%	M	0.0031
+chr1	51822353	C	A	UTR3	EPS15:-	NM_001981:c.*19G>T,NM_001159969:c.*19G>T			179	0	0%	C	73	4	5.19%	M	0.0077
+chr11	118378446	G	T	intronic	KMT2A:+				179	1	0.56%	G	71	5	6.58%	K	0.0096
+chr7	98546195	A	G	exonic	TRRAP:+		nonsynonymous SNV	TRRAP:NM_003496:exon33:c.A4600G:p.S1534G,TRRAP:NM_001244580:exon34:c.A4654G:p.S1552G	179	6	3.24%	A	109	13	10.66%	R	0.0089
+chr16	33371480	C	A	intergenic	LOC390705,RNU6-76P	dist=72778;dist=92027			181	0	0%	C	77	4	4.94%	M	0.0087
+chr1	11293601	C	T	intronic	MTOR:-				194	0	0%	C	95	5	5%	Y	0.0043
+chr14	93299736	G	T	intronic	GOLGA5:+				195	0	0%	G	87	7	7.45%	K	0.0003
+chr3	189586678	G	T	intronic	TP63:+				199	0	0%	G	80	5	5.88%	K	0.0022
+chrY	13839805	G	T	intergenic	NONE,GYG2P1	dist=NONE;dist=678110			20	0	0%	G	13	4	23.53%	K	0.036
+chr2	215657169	A	T	exonic	BARD1:-		stopgain	BARD1:NM_001282543:exon2:c.T159A:p.C53X	203	3	1.46%	A	132	10	7.04%	W	0.0081
+chr12	56491814	G	T	intronic	ERBB3:+				208	0	0%	G	76	4	5%	K	0.0056
+chrX	70348814	C	A	intronic	MED12:+				208	1	0.48%	C	60	5	7.69%	M	0.0033
+chr19	11150023	C	A	intronic	SMARCA4:+				212	1	0.47%	C	107	6	5.31%	M	0.0079
+chr15	22151894	T	A	intergenic	NF1P2,LOC101927079	dist=6092;dist=126137			212	4	1.85%	T	99	9	8.33%	W	0.0077
+chr12	472369	G	T	intronic	KDM5A:-				215	1	0.46%	G	113	6	5.04%	K	0.0091
+chr5	149513719	A	T	intronic	PDGFRB:-				219	1	0.45%	A	68	5	6.85%	W	0.0042
+chr18	59195564	A	T	intronic	CDH20:+				227	0	0%	A	98	4	3.92%	W	0.0089
+chr15	89807435	G	T	intronic	FANCI:+				231	0	0%	G	83	5	5.68%	K	0.0015
+chr5	67569639	C	A	intronic	PIK3R1:+				232	1	0.43%	C	94	6	6%	M	0.0035
+chr4	57335720	G	A	intronic	SRP72:+				234	1	0.43%	G	110	6	5.17%	R	0.0061
+chr17	78353425	C	A	exonic	RNF213:+		synonymous SNV	RNF213:NM_001256071:exon55:c.C13551A:p.G4517G	252	1	0.40%	C	133	6	4.32%	M	0.0091
+chr2	212543723	C	A	intronic	ERBB4:-				252	6	2.33%	C	133	12	8.28%	M	0.0068
+chrX	58573161	G	A	intergenic	ZXDA,NONE	dist=636094;dist=NONE			26	0	0%	G	14	4	22.22%	R	0.0225
+chr11	120317831	G	T	intronic	ARHGEF12:+				262	0	0%	G	101	6	5.61%	K	0.0005
+chrX	39921724	G	T	intronic	BCOR:-				267	1	0.37%	G	115	7	5.74%	K	0.0015
+chr1	36939270	G	T	intronic	CSF3R:-				269	1	0.37%	G	128	7	5.19%	K	0.0024
+chr1	237023355	G	T	intronic	MTR:+				33	0	0%	G	19	4	17.39%	K	0.0241
+chr5	149516741	G	T	intronic	PDGFRB:-				35	0	0%	G	25	4	13.79%	K	0.0374
+chr13	45170107	T	G	intergenic	TSC22D1-AS1,LINC00330	dist=15539;dist=203533			38	1	2.56%	T	25	8	24.24%	K	0.0068
+chr3	178865952	C	T	upstream	PIK3CA:+				465	5	1.06%	C	287	23	7.42%	Y	0
+chr8	17794956	G	T	intronic	PCM1:+				47	0	0%	G	19	4	17.39%	K	0.0097
+chr12	49431641	G	T	exonic	KMT2D:-		synonymous SNV	KMT2D:NM_003482:exon34:c.C9498A:p.T3166T	470	4	0.84%	G	308	30	8.88%	K	0
+chr5	67569227	T	C	exonic	PIK3R1:+		nonsynonymous SNV	PIK3R1:NM_181523:exon3:c.T344C:p.L115P	532	3	0.56%	T	413	14	3.28%	Y	0.0015
+chr1	120539331	C	G	intronic	NOTCH2:-				543	505	48.19%	C	241	294	54.95%	S	0.0063
+chr6	152527558	G	T	intronic	SYNE1:-				56	0	0%	G	31	4	11.43%	K	0.0196
+chrX	48543864	C	A	intronic	WAS:+				57	0	0%	C	33	4	10.81%	M	0.0217
+chr11	85989186	A	T	UTR3	EED:+	NM_152991:c.*149A>T			58	0	0%	A	14	4	22.22%	W	0.0024
+chr2	216299310	T	A	intronic	FN1:-				59	1	1.67%	T	25	6	19.35%	W	0.0058
+chr6	106553292	C	T	exonic	PRDM1:+		synonymous SNV	PRDM1:NM_182907:exon3:c.C855T:p.G285G,PRDM1:NM_001198:exon5:c.C1257T:p.G419G	620	1	0.16%	C	374	25	6.27%	Y	0
+chr6	29693413	G	T	intronic	HLA-F:+				63	0	0%	G	39	4	9.30%	K	0.0248
+chr4	49108180	T	A	intergenic	CWH43,NONE	dist=44085;dist=NONE			63	2	3.08%	T	34	8	19.05%	W	0.0079
+chr19	19261353	G	A	intronic	MEF2B:-,MEF2BNB-MEF2B:-				65	2	2.99%	G	37	9	19.57%	R	0.0047
+chr13	49039468	G	A	exonic	RB1:+		nonsynonymous SNV	RB1:NM_000321:exon23:c.G2453A:p.G818D	666	4	0.60%	G	360	33	8.40%	R	0
+chr19	10288139	G	T	intronic	DNMT1:-				68	0	0%	G	33	4	10.81%	K	0.0138
+chr4	126367833	G	T	intronic	FAT4:+				68	0	0%	G	39	4	9.30%	K	0.0206
+chr2	166611052	G	A	intronic	GALNT3:-				69	0	0%	G	42	4	8.70%	R	0.0236
+chr7	137597919	G	T	intronic	CREB3L2:-				72	0	0%	G	43	4	8.51%	K	0.0225
+chr7	2977009	G	T	intronic	CARD11:-				72	0	0%	G	66	5	7.04%	K	0.028
+chr14	77434872	C	A	intergenic	LRRC74,IRF2BPL	dist=98227;dist=56014			75	0	0%	C	56	4	6.67%	M	0.0369
+chr11	3744787	G	T	intronic	NUP98:-				78	0	0%	G	37	4	9.76%	K	0.0128
+chr20	62319768	T	G	ncRNA_intronic	RTEL1-TNFRSF6B:+				78	0	0%	T	113	9	7.38%	K	0.0104
+chr20	62319772	T	G	ncRNA_intronic	RTEL1-TNFRSF6B:+				79	0	0%	T	107	7	6.14%	K	0.0232
+chr15	91141592	G	A	intronic	CRTC3:+				80	0	0%	G	36	4	10%	R	0.0111
+chr9	139811156	C	T	intronic	TRAF2:+				81	0	0%	C	58	5	7.94%	Y	0.0146
+chr1	150808681	C	A	intronic	ARNT:-				82	0	0%	C	41	5	10.87%	M	0.0052
+chr1	237060506	G	T	intronic	MTR:+				83	0	0%	G	43	6	12.24%	K	0.0021
+chrY	1534946	G	T	exonic	P2RY8:-		nonsynonymous SNV	P2RY8:NM_178129:exon2:c.C506A:p.A169D	83	0	0%	G	69	4	5.48%	K	0.0459
+chr11	3784032	C	A	intronic	NUP98:-				85	0	0%	C	34	4	10.53%	M	0.0081
+chr10	114905732	T	C	intronic	TCF7L2:+				86	2	2.27%	T	63	11	14.86%	Y	0.0035
+chr9	134003958	A	T	intronic	NUP214:+				87	0	0%	A	43	3	6.52%	W	0.0396
+chr11	125505546	G	T	intronic	CHEK1:+				88	0	0%	G	59	4	6.35%	K	0.0286
+chr9	36923282	C	A	intronic	PAX5:-				89	0	0%	C	65	5	7.14%	M	0.0152
+chr14	20082379	C	A	intergenic	POTEM,OR11H2	dist=62107;dist=98684			89	0	0%	C	71	4	5.33%	M	0.0418
+chr8	113308277	G	T	intronic	CSMD3:-				91	0	0%	G	45	4	8.16%	K	0.0138
+chr11	3734029	G	T	intronic	NUP98:-				92	0	0%	G	57	4	6.56%	K	0.0238
+chr12	25398284	C	A	exonic	KRAS:-		nonsynonymous SNV	KRAS:NM_004985:exon2:c.G35T:p.G12V,KRAS:NM_033360:exon2:c.G35T:p.G12V	926	7	0.75%	C	510	37	6.76%	M	0
+chr9	87482528	G	T	intronic	NTRK2:+				93	1	1.06%	G	32	5	13.51%	K	0.0069
+chrX	66942713	C	T	exonic	AR:+		stopgain	AR:NM_000044:exon7:c.C2494T:p.R832X,AR:NM_001011645:exon7:c.C898T:p.R300X	947	4	0.42%	C	426	26	5.75%	Y	0
+chr1	65307425	G	T	intronic	JAK1:-				95	0	0%	G	73	4	5.19%	K	0.0384
+chr8	48720023	A	T	intronic	PRKDC:-				96	0	0%	A	48	4	7.69%	W	0.0141
+chr8	90982850	G	T	intronic	NBN:-				97	0	0%	G	37	4	9.76%	K	0.007
+chr17	37054819	G	T	intronic	LASP1:+				98	0	0%	G	49	4	7.55%	K	0.0141

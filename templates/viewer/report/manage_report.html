@@ -1,0 +1,165 @@
+{% extends "viewer/base.html" %}
+{% load staticfiles %}
+
+{% block extra_js %}
+<script src="{% static 'js/report/manage_report.js' %}"></script>
+<script src="{% static 'js/search/search.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<!-- Modal box content -->
+<div class="container" id="modal_box" style="display:none">
+	<h2>Upload a New Variant Report</h2>
+	<form name='upload_report_form' action="/viewer/upload_report/" method="post" enctype="multipart/form-data">
+		{% csrf_token %}
+        {% for field in report_form %}
+        <div class="row" style="margin-bottom:8px">
+            <div class="col-sm-2">
+                {{ field.label_tag }}
+            </div>
+            <div class="col-sm-6">
+                {{ field }}
+            </div>
+        </div>
+        {% endfor %}
+        <div class="row">
+            <div class="col-sm-6 col-sm-offset-2">
+                <button type="submit" class="btn btn-primary">
+                    <span class="fa fa-cloud-upload"></span>&nbsp;&nbsp;Upload
+                </button>
+            </div>
+        </div>
+	</form>
+	<br/>
+</div>
+<!-- End Modal box content -->
+<div class="container">
+	<h2>{{ project_name }} | Available Variant Reports:</h2>
+
+    <div class="row">
+        <div class="col-md-2">
+            <select class="form-control" id="search_col_select">
+                {% for variant_field in variant_fields %}
+                <option value="{{ variant_field }}"{% if variant_field == "gene_name" %}selected="selected"{% endif %}>{{ variant_field }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select class="form-control" id="search_type_select">
+                <option value="contains">contains</option>
+                <option value="startswith">starts with</option>
+                <option value="endswith">ends with</option>
+                <option value="exact">exactly matches</option>
+                <option value="regex">regular expression</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+                <input type="text" class="form-control" id="search_box" placeholder="Search term..."/>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary" id="search">Search</button>
+        </div>
+    </div>
+
+    <div class="row" id="search-data-area" style="margin-bottom:50px;max-height:300px;overflow:auto">
+        <div class="col-xs-12">
+            <div style="text-align:center;display:none" id="loading_cloud">
+                <span class="fa fa-cloud-download fa-5x animated infinite pulse"></span>
+                <p>Searching database...</p>
+            </div>
+            <div style="text-align:center;display:none" id="error_user" class="event_icon">
+                <span class="fa fa-exclamation-triangle fa-5x animated" style="color:red"></span>
+                <p>Search term cannot be blank. Silly.</p>
+            </div>
+            <div style="text-align:center;display:none" id="error_server" class="event_icon">
+                <span class="fa fa-database fa-5x animated"></span>
+                <span class="fa fa-frown-o fa-5x" style="color:red"></span>
+                <p>Something went wrong. Terribly, horribly wrong.</p>
+            </div>
+            <div style="text-align:center;display:none" id="no_results" class="event_icon">
+                <span class="fa fa-folder-open-o fa-5x animated"></span>
+                <p>No results. Guess it's time to go home.</p>
+            </div>
+
+            <div id="table_container">
+            </div>
+        </div>
+    </div>
+
+    <button type="button" class="btn btn-primary btn-sm igsbviewer-modal-add-button">
+        <span class="fa fa-plus-square"></span>&nbsp;&nbsp;Upload New Variant Report
+    </button>
+    <button type="button" class="btn btn-primary btn-sm" id="information-dashboard">
+        <span class="fa fa-bar-chart-o"></span>&nbsp;&nbsp;Information Dashboard
+    </button>
+    <button type="button" class="btn btn-primary btn-sm" id="share-reports" disabled="disabled">
+        <span class="fa fa-share-alt"></span>&nbsp;&nbsp;Share Report(s)
+    </button>
+    <button type="button" class="btn btn-primary btn-sm" id="download-reports">
+        <span class="fa fa-download"></span>&nbsp;&nbsp;Download Report(s)
+    </button>
+	<table id="available" class="table table-hover tablesorter">
+		<thead>
+			<tr>
+                <th></th>
+                <th>Study</th>
+                <th>Name</th>
+
+                <th></th>
+{#				<th>Sample(s)</th>#}
+{#				<th></th>#}
+				<th>Variants</th>
+				<th>Date Uploaded</th>
+                <th></th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for r in reports %}
+			<tr>
+                <td><label style="display:block;text-align:center"><input type="checkbox" data-reportid="{{ r.pk }}" class="multiplereports"></label></td>
+				{% if r.report_file.name %}
+                <td>
+                    {{r.study}}
+                </td>
+                <td>
+                    {{r.name}}
+                </td>
+                <td>
+                    <span class="fa fa-2x fa-desktop igsbviewer-view-report" data-pk="{{r.pk}}" data-csrf="{% csrf_token %}"></span>
+                </td>
+                {% else %}
+                <td></td>
+                <td></td>
+                {% endif %}
+
+{#				<td>#}
+{#					{% for b in r.bnids.all %}#}
+{#						{{b.sample}} ({{b.bnid}})<br>#}
+{#					{% endfor %}#}
+{#				</td>#}
+{#				<td>{{r.genome}}<br>{{r.caller}}</td>#}
+                <td>
+                    <h6><span class="badge">{{ r.variant_set.all | length }}</span></h6>
+                </td>
+
+				<td>{{r.upload_date}}</td>
+                <td>
+
+                </td>
+                <td>
+{#                    <a href="/viewer/files/{{r.report_file.name}}"><span class="fa fa-2x fa-download igsbviewer-click-icon" data-pk="{{r.pk}}"></span></a>&nbsp;&nbsp;#}
+                    <span class="fa fa-2x fa-pencil-square-o igsbviewer-modal-edit-button" data-pk="{{r.pk}}"></span>&nbsp;&nbsp;
+                    <span class="fa fa-2x fa-trash igsbviewer-modal-delete-button" data-pk="{{r.pk}}"></span>
+                    <span class="fa fa-2x fa-share-alt igsbviewer-modal-share-button" data-pk="{{r.pk}}"></span>
+{#                    <span class="fa fa-2x fa-bar-chart-o igsbviewer-click-icon"></span>#}
+                </td>
+
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% endblock %}
