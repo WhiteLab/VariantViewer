@@ -419,7 +419,7 @@ def delete_bnid(request, bnid_id):
 '''
 Report model
 '''
-@user_passes_test(in_proj_user_group)
+#@user_passes_test(in_proj_user_group)
 def manage_report(request, set_viewing_project_pk=None):
     project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
     if project_pk is None:
@@ -515,6 +515,7 @@ def view_report(request, file_id):
                'report_obj': report_obj}
     return render(request, 'viewer/report/view_report.html', context)
 
+@user_passes_test(in_proj_user_group)
 def delete_report(request, report_id):
     if request.method == 'POST':
         Report.objects.get(pk=report_id).delete()
