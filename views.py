@@ -207,6 +207,63 @@ def delete_study(request, study_id):
                                   context_instance=RequestContext(request))
 
 '''
+Merged Samples/BIDs into Metadata
+'''
+@user_passes_test(in_proj_user_group)
+def manage_metadata(request, set_viewing_project_pk=None):
+    project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
+    if project_pk is None:
+        return HttpResponseRedirect('/viewer/error/no_project')
+    project = Project.objects.get(pk=project_pk)
+    context = {
+        'project_name': project.name,
+        # 'bnids': Bnid.objects.filter(sample__study__project__pk=project_pk),
+        'samples': Sample.objects.filter(study__project__pk=project_pk)
+    }
+    return render(request, 'viewer/metadata/manage_metadata.html', context)
+
+
+def new_metadata(request):
+    if request.method == 'POST':
+        sheet_data = simplejson.loads(request.POST.get('sheet'))
+        for row in sheet_data:
+            (study_name, sample_name,
+             bid, description, cellularity) = row
+            if not Study.objects.filter(name=study_name).exists():
+                # Notify user
+                continue
+            if not Sample.objects.filter(name=sample_name).exists():
+                new_sample = Sample()
+                new_sample.name = sample_name
+                new_sample.description = description
+                new_sample.cellularity = cellularity
+                new_sample.study = Study.objects.get(name=study_name)
+                new_sample.save()
+            if not Bnid.objects.filter(bnid=bid).exists():
+                new_bnid = Bnid()
+                new_bnid.bnid = bid
+                new_bnid.sample = Sample.objects.get(name=sample_name)
+                new_bnid.save()
+        return HttpResponseRedirect('/viewer/metadata/')
+    else:
+        project_pk = request.session.get('viewing_project', None)
+        if project_pk is None:
+            return HttpResponseRedirect('/viewer/error/no_project')
+        project = Project.objects.get(pk=project_pk)
+        context = {
+            'project_name': project.name
+        }
+        # sform = SampleForm(instance=Sample())
+        # sform.fields['study'].queryset = project.study_set.all()
+        # context = {
+        #     'sample_form': sform,
+        #     'project_name': project.name
+        # }
+        # context.update(csrf(request))
+        return render_to_response('viewer/metadata/new_metadata.html', context,
+                                  context_instance=RequestContext(request))
+
+'''
 Sample model
 '''
 @user_passes_test(in_proj_user_group)

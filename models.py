@@ -18,7 +18,7 @@ class Project(models.Model):
 
 
 class Study(models.Model):
-    name = models.CharField(max_length=64, verbose_name="Study Name")
+    name = models.CharField(max_length=64, verbose_name="Study Name", unique=True)
     project = models.ForeignKey(Project)
     description = models.CharField(max_length=256,
                                    verbose_name="Study Description",
@@ -49,7 +49,7 @@ class Genome(models.Model):
 
 
 class Sample(models.Model):
-    name = models.CharField(max_length=48, verbose_name='Sample Name')
+    name = models.CharField(max_length=48, verbose_name='Sample Name', unique=True)
     description = models.CharField(max_length=256,
                                    verbose_name="Sample Description",
                                    blank=True)

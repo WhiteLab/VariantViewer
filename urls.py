@@ -72,6 +72,10 @@ urlpatterns = patterns('',
                        url(r'^get_samples/(?P<study_id>\d+)/$', views.get_samples,
                            name='get_samples'),
 
+                       # Metadata
+                       url(r'^metadata/$', views.manage_metadata, name='manage_metadata'),
+                       url(r'^metadata/new_metadata/$', views.new_metadata, name='new_metadata'),
+
                        # Study
                        url(r'^study/$', views.manage_study, name='manage_study'),
                        url(r'^study/(?P<set_viewing_project_pk>\d+)$', views.manage_study,

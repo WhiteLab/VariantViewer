@@ -1,0 +1,32 @@
+<div class="container">
+	<h2>Create a New Metadatas | {{ project_name }}</h2>
+    <form action="/viewer/metadata/new_metadata/" method="post">
+        {% csrf_token %}
+        <div id="new-metadata-sheet"></div><br/>
+        <button class="btn btn-primary" id="new-metadata-btn">Create</button>
+        <input type="hidden" name="sheet" id="new-metadata-data"/>
+    </form>
+
+</div>
+<script>
+    $(document).ready(function(){
+        sheet_data = [
+            ['', '', '', '', ''],
+            ['', '', '', '', ''],
+            ['', '', '', '', ''],
+            ['', '', '', '', ''],
+            ['', '', '', '', ''],
+            ['', '', '', '', '']
+        ];
+        var ht = new Handsontable($('#new-metadata-sheet')[0], {
+            data: sheet_data,
+            rowHeaders: true,
+            colHeaders: ['Study', 'Sample', 'BID', 'Description', 'Percent Cellularity']
+        });
+        $('#new-metadata-btn').click(function(){
+            var sheet_data_json = JSON.stringify(sheet_data)
+            $('#new-metadata-data').val(sheet_data_json);
+            $('form').submit();
+        });
+    });
+</script>
