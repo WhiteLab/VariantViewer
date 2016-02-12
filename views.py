@@ -515,6 +515,22 @@ def view_report(request, file_id):
                'report_obj': report_obj}
     return render(request, 'viewer/report/view_report.html', context)
 
+# get info to upload reports
+def report_info_get(request, bid):
+    try:
+        report_info = Bnid.objects.get(bnid=bid)
+    except:
+        return HttpResponse('{}')
+
+    #if report_info.bid is None:
+    #    return HttpResponse('{}')
+    json_response = {'sample': report_info.sample.name,
+                     'study': report_info.sample.study.name}
+
+    pretty = simplejson.dumps(json_response, sort_keys=True, indent=4)
+    return HttpResponse(pretty)
+
+
 @user_passes_test(in_proj_user_group)
 def delete_report(request, report_id):
     if request.method == 'POST':
@@ -689,20 +705,6 @@ def view_share_data_expired(request):
 def view_share_data_dne(request):
     return render(request, 'viewer/error/share_data_dne.html')
 
-# get info to upload reports
-def report_info_get(request, bid):
-    try:
-        report_info = Bnid.objects.get(bnid=bid)
-    except:
-        return HttpResponse('{}')
-
-    #if report_info.bid is None:
-    #    return HttpResponse('{}')
-    json_response = {'sample': report_info.sample.name,
-                     'study': report_info.sample.study.name}
-
-    pretty = simplejson.dumps(json_response, sort_keys=True, indent=4)
-    return HttpResponse(pretty)
 # @user_passes_test(in_proj_user_group)
 # def share_report(request, report_id=None):
 #     if request.method == 'POST':
