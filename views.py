@@ -40,10 +40,17 @@ def register(request):
             registered = True
             firstname = user_form['first_name'].value()
             lastname = user_form['last_name'].value()
+            admin_url = '<a href="http://igsbimg.uchicago.edu/viewer/admin/auth/user/{}/">{}</a>'.format(
+                user.id,
+                request.POST.get('user_type')
+            )
             subject = 'Report Viewer Registration: {}, {}'.format(
                 lastname, firstname)
             message = 'User {} {} <{}> has registered and needs to be vetted.'.format(
                 firstname, lastname, user.email)
+            message += ' User is requesting {} status.'.format(
+                admin_url
+            )
             send_mail(subject, message, 'miguelb@uchicago.edu',
                       ['miguelb@uchicago.edu'], fail_silently=False)
         else:

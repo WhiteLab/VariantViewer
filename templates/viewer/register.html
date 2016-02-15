@@ -16,6 +16,10 @@
 		<table>
 			{{ user_form.as_table }}
 		</table>
+        I would like to be:<br/>
+        <input type="radio" name="user_type" value="admin">&nbsp;&nbsp;Administrative User<br/>
+        <input type="radio" name="user_type" value="project">&nbsp;&nbsp;Project User<br/>
+        <input type="radio" name="user_type" value="external">&nbsp;&nbsp;External User<br/><br/>
 		<input type="submit" name="submit" value="Register"/>
 	</form>
 	{% endif %}
