@@ -525,7 +525,8 @@ def report_info_get(request, bid):
     #if report_info.bid is None:
     #    return HttpResponse('{}')
     json_response = {'sample': report_info.sample.name,
-                     'study': report_info.sample.study.name}
+                     'study': report_info.sample.study.name,
+                     'description': report_info.sample.description}
 
     pretty = simplejson.dumps(json_response, sort_keys=True, indent=4)
     return HttpResponse(pretty)
