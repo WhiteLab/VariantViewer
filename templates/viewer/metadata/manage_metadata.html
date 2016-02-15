@@ -57,9 +57,11 @@ $(document).ready(function(){
 {% block content %}
 <div class="container">
     <h2>{{ project_name }} | Available Metadata:</h2>
+    {% if perms.viewer.add_sample %}
     <button type="button" class="btn btn-primary btn-sm igsbviewer-modal-add-button">
         <span class="fa fa-plus-square"></span>&nbsp;&nbsp;Add New Metadata
     </button>
+    {% endif %}
 	<table class="table table-hover">
 		<thead>
             <tr>
@@ -82,7 +84,9 @@ $(document).ready(function(){
             <td>{{s.cellularity}}</td>
             <td>{{s.creation_date}}</td>
             <td>
+                {% if perms.viewer.delete_sample %}
                 <span class="fa fa-2x fa-trash igsbviewer-modal-delete-button" data-pk="{{s.pk}}"></span>
+                {% endif %}
             </td>
         </tr>
         {% endfor %}

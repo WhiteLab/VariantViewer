@@ -5,24 +5,32 @@
         <b class="caret"></b>
     </a>
     <ul class="dropdown-menu" id="{{ project.name }}_project_dropdown"{% if project.current %} style="display:block"{% endif %}>
+        {% if perms.viewer.add_study %}
         <li>
             <a href="/viewer/study/{{ project.pk }}" tabindex="-1">
                 Studies
                 <span class="sidebar-badge">{{ project.studies }}</span>
             </a>
         </li>
+        {% endif %}
         <li>
-            <a href="/viewer/sample/{{ project.pk }}" tabindex="-1">
-                Samples
+            <a href="/viewer/metadata/{{ project.pk }}" tabindex="-1">
+                Metadata
                 <span class="sidebar-badge">{{ project.samples }}</span>
             </a>
         </li>
-        <li>
-            <a href="/viewer/bnid/{{ project.pk }}" tabindex="-1">
-                Bionimbus IDs
-                <span class="sidebar-badge">{{ project.bnids }}</span>
-            </a>
-        </li>
+{#        <li>#}
+{#            <a href="/viewer/sample/{{ project.pk }}" tabindex="-1">#}
+{#                Samples#}
+{#                <span class="sidebar-badge">{{ project.samples }}</span>#}
+{#            </a>#}
+{#        </li>#}
+{#        <li>#}
+{#            <a href="/viewer/bnid/{{ project.pk }}" tabindex="-1">#}
+{#                Bionimbus IDs#}
+{#                <span class="sidebar-badge">{{ project.bnids }}</span>#}
+{#            </a>#}
+{#        </li>#}
         <li>
             <a href="/viewer/report/{{ project.pk }}" tabindex="-1">
                 Reports

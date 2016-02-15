@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import user_passes_test, permission_required, login_required
 from django.core.context_processors import csrf
 from django.core.mail import send_mail
 from django.http import HttpResponse, HttpResponseRedirect
@@ -85,6 +85,7 @@ def change_password(request):
 
 def restricted(request):
     context = {}
+    return HttpResponse('You are not authorized to access this content.')
     return render(request, '/viewer/index.html', context)
 
 
@@ -102,14 +103,16 @@ def user_logout(request):
 '''
 Project model
 '''
-@user_passes_test(in_proj_user_group)
+# @user_passes_test(in_proj_user_group)
+@permission_required('viewer.add_project', login_url='/viewer/restricted/')
 def manage_project(request):
     context = {'projects': Project.objects.all()}
     context.update(csrf(request))
     return render_to_response('viewer/project/manage_project.html', context,
                               context_instance=RequestContext(request))
 
-@user_passes_test(in_proj_user_group)
+# @user_passes_test(in_proj_user_group)
+@permission_required('viewer.add_project', login_url='/viewer/restricted/')
 def new_project(request):
     if request.method == 'POST':
         pform = ProjectForm(request.POST, instance=Project())
@@ -123,7 +126,8 @@ def new_project(request):
         return render_to_response('viewer/project/new_project.html', context,
                                   context_instance=RequestContext(request))
 
-@user_passes_test(in_proj_user_group)
+# @user_passes_test(in_proj_user_group)
+@permission_required('viewer.change_project', login_url='/viewer/restricted/')
 def edit_project(request, project_id):
     if request.method == 'POST':
         p = Project.objects.get(pk=project_id)
@@ -144,7 +148,8 @@ def edit_project(request, project_id):
 '''
 Study model
 '''
-@user_passes_test(in_proj_user_group)
+# @user_passes_test(in_proj_user_group)
+@permission_required('viewer.add_study', login_url='/viewer/restricted/')
 def manage_study(request, set_viewing_project_pk=None):
     project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
     if project_pk is None:
@@ -158,7 +163,9 @@ def manage_study(request, set_viewing_project_pk=None):
     return render_to_response('viewer/study/manage_study.html', context,
                               context_instance=RequestContext(request))
 
-@user_passes_test(in_proj_user_group)
+
+@permission_required('viewer.add_study', login_url='/viewer/restricted/')
+# @user_passes_test(in_proj_user_group)
 def new_study(request):
     if request.method == 'POST':
         sform = StudyForm(request.POST, instance=Study())
@@ -178,7 +185,8 @@ def new_study(request):
         return render_to_response('viewer/study/new_study.html', context,
                                   context_instance=RequestContext(request))
 
-@user_passes_test(in_proj_user_group)
+# @user_passes_test(in_proj_user_group)
+@permission_required('viewer.change_study', login_url='/viewer/restricted/')
 def edit_study(request, study_id):
     if request.method == 'POST':
         s = Study.objects.get(pk=study_id)
@@ -194,7 +202,8 @@ def edit_study(request, study_id):
         return render_to_response('viewer/study/edit_study.html', context,
                                   context_instance=RequestContext(request))
 
-@user_passes_test(in_proj_user_group)
+# @user_passes_test(in_proj_user_group)
+@permission_required('viewer.delete_study', login_url='/viewer/restricted/')
 def delete_study(request, study_id):
     if request.method == 'POST':
         Study.objects.get(pk=study_id).delete()
@@ -209,7 +218,8 @@ def delete_study(request, study_id):
 '''
 Merged Samples/BIDs into Metadata
 '''
-@user_passes_test(in_proj_user_group)
+# @user_passes_test(in_proj_user_group)
+@login_required
 def manage_metadata(request, set_viewing_project_pk=None):
     project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
     if project_pk is None:
@@ -222,7 +232,7 @@ def manage_metadata(request, set_viewing_project_pk=None):
     }
     return render(request, 'viewer/metadata/manage_metadata.html', context)
 
-
+@permission_required('viewer.add_sample', login_url='/viewer/restricted/')
 def new_metadata(request):
     if request.method == 'POST':
         sheet_data = simplejson.loads(request.POST.get('sheet'))
@@ -419,7 +429,8 @@ def delete_bnid(request, bnid_id):
 '''
 Report model
 '''
-@user_passes_test(in_proj_user_group)
+# @user_passes_test(in_proj_user_group)
+@login_required
 def manage_report(request, set_viewing_project_pk=None):
     project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
     if project_pk is None:
@@ -432,7 +443,8 @@ def manage_report(request, set_viewing_project_pk=None):
     context.update(csrf(request))
     return render(request, 'viewer/report/manage_report.html', context)
 
-@user_passes_test(in_proj_user_group)
+# @user_passes_test(in_proj_user_group)
+@permission_required('viewer.add_report', login_url='/viewer/restricted/')
 def upload_report(request):
     if request.method == 'POST':
         print "POST from upload_report"
@@ -459,7 +471,8 @@ def upload_report(request):
         return render_to_response('viewer/report/upload_report.html', context,
                                   context_instance=RequestContext(request))
 
-@user_passes_test(in_proj_user_group)
+# @user_passes_test(in_proj_user_group)
+@permission_required('viewer.change_report', login_url='/viewer/restricted/')
 def edit_report(request, report_id):
     if request.method == 'POST':
         r = Report.objects.get(pk=report_id)
@@ -487,7 +500,8 @@ def edit_report(request, report_id):
         return render_to_response('viewer/report/edit_report.html', context,
                                   context_instance=RequestContext(request))
 
-@user_passes_test(in_proj_user_group)
+# @user_passes_test(in_proj_user_group)
+@login_required
 def view_report(request, file_id):
     # build context from file
     print 'file_id: %s' % file_id
@@ -515,6 +529,7 @@ def view_report(request, file_id):
                'report_obj': report_obj}
     return render(request, 'viewer/report/view_report.html', context)
 
+@permission_required('viewer.delete_report', login_url='/viewer/restricted/')
 def delete_report(request, report_id):
     if request.method == 'POST':
         Report.objects.get(pk=report_id).delete()
@@ -830,15 +845,15 @@ def populate_sidebar(request):
             for study in project.study_set.all():
                 num_samples += study.sample_set.all().count()
                 num_reports += study.report_set.all().count()
-                for sample in study.sample_set.all():
-                    num_bnids += sample.bnid_set.all().count()
+                # for sample in study.sample_set.all():
+                #     num_bnids += sample.bnid_set.all().count()
 
             project_data = {
                 'name': project.name,
                 'pk': project.pk,
                 'studies': num_studies,
                 'samples': num_samples,
-                'bnids': num_bnids,
+                # 'bnids': num_bnids,
                 'reports': num_reports,
                 'current': True if current_project_pk == str(project.pk) else False
             }
