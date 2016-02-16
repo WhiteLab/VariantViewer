@@ -1,8 +1,8 @@
 <div class="container">
-	<h2>Delete Study: {{ name }}</h2>
+	<h2>Delete Sample: {{ name }}</h2>
     <p>Are you sure you want to delete '{{ name }}'?<br/>
-    This will also delete everything associated with this study.</p>
-    <form enctype="multipart/form-data" method="post" action="{% url 'delete_study' pk %}">
+    This will also delete everything associated with this sample.</p>
+    <form enctype="multipart/form-data" method="post" action="{% url 'delete_sample' pk %}">
 		{% csrf_token %}
         <div class="row">
             <div class="col-xs-12">

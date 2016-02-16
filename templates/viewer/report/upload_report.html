@@ -1,5 +1,5 @@
 <script type="text/javascript">
-//$(document).ready(function(){
+$(document).ready(function(){
     $('select[name=study]').change(function(){
         var study_id = $(this).val();
         var options = [];
@@ -16,11 +16,11 @@
     });
 
     $('select[name=bnids]').empty();
-//});
+});
 </script>
 <div class="container">
 	<h2>Upload a New Variant Report</h2>
-	<form name='upload_report_form' action="/viewer/report/upload_report/" method="post" enctype="multipart/form-data">
+	<form name='upload_report_form' action="{% url 'upload_report' %}" method="post" enctype="multipart/form-data">
 		{% csrf_token %}
         {% for field in report_form %}
         <div class="row" style="margin-bottom:8px">

@@ -1,32 +1,25 @@
-from django.conf import settings
+import simplejson
+
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import user_passes_test, permission_required, login_required
+from django.contrib.auth.decorators import permission_required, login_required
 from django.core.context_processors import csrf
 from django.core.mail import send_mail
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, render_to_response
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
-from django import forms
-import os
-import simplejson
-import datetime
+from django.core.urlresolvers import reverse, reverse_lazy
+from django.conf import settings
 
-#from django_ajax.decorators import ajax
-
-from forms import ProjectForm, BnidForm, SampleForm, ReportForm, \
-    StudyForm, UserForm, SharedDataForm, ContactForm
-from forms import StudySelectorForm
-from models import Project, Bnid, Sample, Report, Study, Variant, SharedData, Contact
-from access_tests import in_proj_user_group
+from forms import (ProjectForm, ReportForm, StudyForm,
+                   UserForm, SharedDataForm, ContactForm)
+from models import *
 
 from util import report_parser, render_charts
 
-import tablib
-
 
 def index(request):
-    return render(request, 'viewer/index.html', {})
+    return render(request, 'viewer/index.html')
 
 
 def register(request):
@@ -57,9 +50,13 @@ def register(request):
             print user_form.errors
     else:
         user_form = UserForm()
-    context = {'user_form': user_form, 'registered': registered}
+    context = {
+        'user_form': user_form,
+        'registered': registered,
+        'viewer_admin_email': settings.VIEWER_ADMIN_EMAIL
+    }
     context.update(csrf(request))
-    return render_to_response('viewer/register.html', context,
+    return render_to_response('viewer/user/register.html', context,
                               context_instance=RequestContext(request))
 
 
@@ -71,7 +68,7 @@ def user_login(request):
         if user:
             if user.is_active:
                 login(request, user)
-                return HttpResponseRedirect('/viewer/')
+                return HttpResponseRedirect(reverse('viewer_index'))
             else:
                 # user is inactive
                 return HttpResponse("Sorry, your account is disabled.")
@@ -82,7 +79,8 @@ def user_login(request):
     else:
         context = {}
         context.update(csrf(request))
-        return render(request, 'viewer/login.html', context)
+        return render(request, 'viewer/user/login.html', context)
+
 
 def change_password(request):
     if request.method == 'POST':
@@ -90,42 +88,36 @@ def change_password(request):
 
     return HttpResponse('change password')
 
+
 def restricted(request):
-    context = {}
     return HttpResponse('You are not authorized to access this content.')
-    return render(request, '/viewer/index.html', context)
 
 
-def permission(request):
-    context = {}
-    return render(request, '/viewer/permission.html', context)
-
-
-@user_passes_test(in_proj_user_group)
 def user_logout(request):
     logout(request)
-    return HttpResponseRedirect('/viewer/')
+    return HttpResponseRedirect(reverse('viewer_index'))
 
 
 '''
 Project model
 '''
-# @user_passes_test(in_proj_user_group)
-@permission_required('viewer.add_project', login_url='/viewer/restricted/')
+
+
+@permission_required('viewer.add_project', login_url=reverse_lazy('viewer_restricted'))
 def manage_project(request):
     context = {'projects': Project.objects.all()}
     context.update(csrf(request))
     return render_to_response('viewer/project/manage_project.html', context,
                               context_instance=RequestContext(request))
 
-# @user_passes_test(in_proj_user_group)
-@permission_required('viewer.add_project', login_url='/viewer/restricted/')
+
+@permission_required('viewer.add_project', login_url=reverse_lazy('viewer_restricted'))
 def new_project(request):
     if request.method == 'POST':
         pform = ProjectForm(request.POST, instance=Project())
         if pform.is_valid():
             pform.save()
-        return HttpResponseRedirect('/viewer/project/')
+        return HttpResponseRedirect(reverse('manage_project'))
     else:
         pform = ProjectForm(instance=Project())
         context = {'project_form': pform}
@@ -133,15 +125,15 @@ def new_project(request):
         return render_to_response('viewer/project/new_project.html', context,
                                   context_instance=RequestContext(request))
 
-# @user_passes_test(in_proj_user_group)
-@permission_required('viewer.change_project', login_url='/viewer/restricted/')
+
+@permission_required('viewer.change_project', login_url=reverse_lazy('viewer_restricted'))
 def edit_project(request, project_id):
     if request.method == 'POST':
         p = Project.objects.get(pk=project_id)
         updated_form = ProjectForm(request.POST, instance=p)
         if updated_form.is_valid():
             updated_form.save()
-            return HttpResponseRedirect('/viewer/project/')
+            return HttpResponseRedirect(reverse('manage_project'))
     else:
         proj_obj = Project.objects.get(pk=project_id)
         pform = ProjectForm(instance=proj_obj)
@@ -155,12 +147,13 @@ def edit_project(request, project_id):
 '''
 Study model
 '''
-# @user_passes_test(in_proj_user_group)
-@permission_required('viewer.add_study', login_url='/viewer/restricted/')
+
+
+@permission_required('viewer.add_study', login_url=reverse_lazy('viewer_restricted'))
 def manage_study(request, set_viewing_project_pk=None):
     project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
     if project_pk is None:
-        return HttpResponseRedirect('/viewer/error/no_project')
+        return HttpResponseRedirect(reverse('no_project'))
     project = Project.objects.get(pk=project_pk)
     context = {
         'studies': project.study_set.all(),
@@ -171,18 +164,17 @@ def manage_study(request, set_viewing_project_pk=None):
                               context_instance=RequestContext(request))
 
 
-@permission_required('viewer.add_study', login_url='/viewer/restricted/')
-# @user_passes_test(in_proj_user_group)
+@permission_required('viewer.add_study', login_url=reverse_lazy('viewer_restricted'))
 def new_study(request):
     if request.method == 'POST':
         sform = StudyForm(request.POST, instance=Study())
         if sform.is_valid():
             sform.save()
-        return HttpResponseRedirect('/viewer/study/')
+        return HttpResponseRedirect(reverse('manage_study'))
     else:
         project_pk = request.session.get('viewing_project', None)
         if project_pk is None:
-            return HttpResponseRedirect('/viewer/error/no_project/')
+            return HttpResponseRedirect(reverse('no_project'))
         sform = StudyForm(instance=Study(), initial={'project': project_pk})
         context = {
             'study_form': sform,
@@ -192,15 +184,15 @@ def new_study(request):
         return render_to_response('viewer/study/new_study.html', context,
                                   context_instance=RequestContext(request))
 
-# @user_passes_test(in_proj_user_group)
-@permission_required('viewer.change_study', login_url='/viewer/restricted/')
+
+@permission_required('viewer.change_study', login_url=reverse_lazy('viewer_restricted'))
 def edit_study(request, study_id):
     if request.method == 'POST':
         s = Study.objects.get(pk=study_id)
         updated_form = StudyForm(request.POST, instance=s)
         if updated_form.is_valid():
             updated_form.save()
-            return HttpResponseRedirect('/viewer/study/')
+            return HttpResponseRedirect(reverse('manage_study'))
     else:
         study_obj = Study.objects.get(pk=study_id)
         sform = StudyForm(instance=study_obj)
@@ -209,12 +201,12 @@ def edit_study(request, study_id):
         return render_to_response('viewer/study/edit_study.html', context,
                                   context_instance=RequestContext(request))
 
-# @user_passes_test(in_proj_user_group)
-@permission_required('viewer.delete_study', login_url='/viewer/restricted/')
+
+@permission_required('viewer.delete_study', login_url=reverse_lazy('viewer_restricted'))
 def delete_study(request, study_id):
     if request.method == 'POST':
         Study.objects.get(pk=study_id).delete()
-        return HttpResponseRedirect('/viewer/study/')
+        return HttpResponseRedirect(reverse('manage_study'))
     else:
         study_obj = Study.objects.get(pk=study_id)
         context = {'name': study_obj.name, 'pk': study_obj.pk}
@@ -225,21 +217,22 @@ def delete_study(request, study_id):
 '''
 Merged Samples/BIDs into Metadata
 '''
-# @user_passes_test(in_proj_user_group)
+
+
 @login_required
 def manage_metadata(request, set_viewing_project_pk=None):
     project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
     if project_pk is None:
-        return HttpResponseRedirect('/viewer/error/no_project')
+        return HttpResponseRedirect(reverse('no_project'))
     project = Project.objects.get(pk=project_pk)
     context = {
         'project_name': project.name,
-        # 'bnids': Bnid.objects.filter(sample__study__project__pk=project_pk),
         'samples': Sample.objects.filter(study__project__pk=project_pk)
     }
     return render(request, 'viewer/metadata/manage_metadata.html', context)
 
-@permission_required('viewer.add_sample', login_url='/viewer/restricted/')
+
+@permission_required('viewer.add_sample', login_url=reverse_lazy('viewer_restricted'))
 def new_metadata(request):
     if request.method == 'POST':
         sheet_data = simplejson.loads(request.POST.get('sheet'))
@@ -261,187 +254,41 @@ def new_metadata(request):
                 new_bnid.bnid = bid
                 new_bnid.sample = Sample.objects.get(name=sample_name)
                 new_bnid.save()
-        return HttpResponseRedirect('/viewer/metadata/')
+        return HttpResponseRedirect(reverse('manage_metadata'))
     else:
         project_pk = request.session.get('viewing_project', None)
         if project_pk is None:
-            return HttpResponseRedirect('/viewer/error/no_project')
+            return HttpResponseRedirect(reverse('no_project'))
         project = Project.objects.get(pk=project_pk)
         context = {
             'project_name': project.name
         }
-        # sform = SampleForm(instance=Sample())
-        # sform.fields['study'].queryset = project.study_set.all()
-        # context = {
-        #     'sample_form': sform,
-        #     'project_name': project.name
-        # }
-        # context.update(csrf(request))
         return render_to_response('viewer/metadata/new_metadata.html', context,
                                   context_instance=RequestContext(request))
 
-'''
-Sample model
-'''
-@user_passes_test(in_proj_user_group)
-def manage_sample(request, set_viewing_project_pk=None):
-    project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
-    if project_pk is None:
-        return HttpResponseRedirect('/viewer/error/no_project')
-    project = Project.objects.get(pk=project_pk)
-    context = {
-        'samples': Sample.objects.filter(study__project__pk=project_pk),
-        'project_name': project.name
-    }
-    context.update(csrf(request))
-    return render(request, 'viewer/sample/manage_sample.html', context)
 
-@user_passes_test(in_proj_user_group)
-def new_sample(request):
-    if request.method == 'POST':
-        sform = SampleForm(request.POST, instance=Sample())
-        if sform.is_valid():
-            sform.save()
-        return HttpResponseRedirect('/viewer/sample/')
-    else:
-        project_pk = request.session.get('viewing_project', None)
-        if project_pk is None:
-            return HttpResponseRedirect('/viewer/error/no_project')
-        project = Project.objects.get(pk=project_pk)
-        sform = SampleForm(instance=Sample())
-        sform.fields['study'].queryset = project.study_set.all()
-        context = {
-            'sample_form': sform,
-            'project_name': project.name
-        }
-        context.update(csrf(request))
-        return render_to_response('viewer/sample/new_sample.html', context,
-                                  context_instance=RequestContext(request))
-
-@user_passes_test(in_proj_user_group)
-def edit_sample(request, sample_id):
-    if request.method == 'POST':
-        s = Sample.objects.get(pk=sample_id)
-        updated_form = SampleForm(request.POST, instance=s)
-        if updated_form.is_valid():
-            updated_form.save()
-            return HttpResponseRedirect('/viewer/sample/')
-    else:
-        project_pk = request.session.get('viewing_project', None)
-        if project_pk is None:
-            return HttpResponseRedirect('/viewer/error/no_project')
-        project = Project.objects.get(pk=project_pk)
-        sample_obj = Sample.objects.get(pk=sample_id)
-        sform = SampleForm(instance=sample_obj)
-        sform.fields['study'].queryset = project.study_set.all()
-        context = {
-            'sample_form': sform,
-            'name': sample_obj.name,
-            'pk': sample_obj.pk,
-            'project_name': project.name
-        }
-        context.update(csrf(request))
-        return render_to_response('viewer/sample/edit_sample.html', context,
-                                  context_instance=RequestContext(request))
-
-@user_passes_test(in_proj_user_group)
+@permission_required('viewer.delete_sample', login_url=reverse_lazy('viewer_restricted'))
 def delete_sample(request, sample_id):
     if request.method == 'POST':
         Sample.objects.get(pk=sample_id).delete()
-        return HttpResponseRedirect('/viewer/sample')
+        return HttpResponseRedirect(reverse('manage_metadata'))
     else:
         sample_obj = Sample.objects.get(pk=sample_id)
         context = {'name': sample_obj.name, 'pk': sample_obj.pk}
         context.update(csrf(request))
-        return render(request, 'viewer/sample/delete_sample.html', context)
+        return render(request, 'viewer/metadata/delete_sample.html', context)
 
-'''
-Bionimbus ID model
-'''
-@user_passes_test(in_proj_user_group)
-def manage_bnid(request, set_viewing_project_pk=None):
-    project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
-    if project_pk is None:
-        return HttpResponseRedirect('/viewer/error/no_project')
-    context = {
-        'bnids': Bnid.objects.filter(sample__study__project__pk=project_pk),
-        'project_name': Project.objects.get(pk=project_pk).name
-    }
-    context.update(csrf(request))
-    return render(request, 'viewer/bnid/manage_bnid.html', context)
-
-@user_passes_test(in_proj_user_group)
-def new_bnid(request): #study_id=None, **kwargs):
-    #if study_id:
-        #print "Got study_id: {}".format(study_id)
-    if request.method == 'POST':
-        bform = BnidForm(request.POST, instance=Bnid())
-        # print bform['sample']
-        # print bform['bnid']
-        if bform.is_valid():
-            bform.save()
-        return HttpResponseRedirect('/viewer/bnid/')
-    else:
-        project_pk = request.session.get('viewing_project', None)
-        if project_pk is None:
-            return HttpResponseRedirect('/viewer/error/no_project')
-        project = Project.objects.get(pk=project_pk)
-        bform = BnidForm(instance=Bnid())
-        bform.fields['sample'].queryset = Sample.objects.filter(study__project__pk=project_pk)
-        # Why does this study selector form exist? TODO
-        ss_form = StudySelectorForm()
-        context = {'bnid_form': bform, 'study_selector_form': ss_form, 'project_name': project.name}
-        context.update(csrf(request))
-        return render_to_response('viewer/bnid/new_bnid.html', context,
-                                  context_instance=RequestContext(request))
-
-@user_passes_test(in_proj_user_group)
-def edit_bnid(request, bnid_id):
-    if request.method == 'POST':
-        b = Sample.objects.get(pk=bnid_id)
-        updated_form = BnidForm(request.POST, instance=b)
-        if updated_form.is_valid():
-            updated_form.save()
-            return HttpResponseRedirect('/viewer/bnid/')
-    else:
-        project_pk = request.session.get('viewing_project', None)
-        if project_pk is None:
-            return HttpResponseRedirect('/viewer/error/no_project')
-        project = Project.objects.get(pk=project_pk)
-        bnid_obj = Bnid.objects.get(pk=bnid_id)
-        bform = BnidForm(instance=bnid_obj)
-        bform.fields['sample'].queryset = Sample.objects.filter(study__project__pk=project_pk)
-        ss_form = StudySelectorForm()
-        context = {'bnid_form': bform,
-                   'bnid': bnid_obj.bnid,
-                   'pk': bnid_obj.pk,
-                   'study_selector_form': ss_form,
-                   'project_name': project.name
-                   }
-        context.update(csrf(request))
-        return render_to_response('viewer/bnid/edit_bnid.html', context,
-                                  context_instance=RequestContext(request))
-
-@user_passes_test(in_proj_user_group)
-def delete_bnid(request, bnid_id):
-    if request.method == 'POST':
-        Bnid.objects.get(pk=bnid_id).delete()
-        return HttpResponseRedirect('/viewer/bnid/')
-    else:
-        bnid_obj = Bnid.objects.get(pk=bnid_id)
-        context = {'bnid': bnid_obj.bnid, 'pk': bnid_obj.pk}
-        context.update(csrf(request))
-        return render(request, 'viewer/bnid/delete_bnid.html', context)
 
 '''
 Report model
 '''
-# @user_passes_test(in_proj_user_group)
+
+
 @login_required
 def manage_report(request, set_viewing_project_pk=None):
     project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
     if project_pk is None:
-        return HttpResponseRedirect('/viewer/error/no_project/')
+        return HttpResponseRedirect(reverse('no_project'))
     context = {
         'reports': Report.objects.filter(study__project__pk=project_pk),
         'project_name': Project.objects.get(pk=project_pk).name,
@@ -450,8 +297,8 @@ def manage_report(request, set_viewing_project_pk=None):
     context.update(csrf(request))
     return render(request, 'viewer/report/manage_report.html', context)
 
-# @user_passes_test(in_proj_user_group)
-@permission_required('viewer.add_report', login_url='/viewer/restricted/')
+
+@permission_required('viewer.add_report', login_url=reverse_lazy('viewer_restricted'))
 def upload_report(request):
     if request.method == 'POST':
         print "POST from upload_report"
@@ -462,14 +309,14 @@ def upload_report(request):
         if rform.is_valid():
             report = rform.save()
             report_parser.load_into_db(report)
-            return HttpResponseRedirect('/viewer/report/')
+            return HttpResponseRedirect(reverse('manage_report'))
         else:
             print "rform (ReportForm) is Invalid"
             print str(rform)
     else:
         project_pk = request.session.get('viewing_project', None)
         if project_pk is None:
-            return HttpResponseRedirect('/viewer/error/no_project')
+            return HttpResponseRedirect(reverse('no_project'))
         project = Project.objects.get(pk=project_pk)
         rform = ReportForm(instance=Report(), initial={})
         rform.fields['study'].queryset = project.study_set.all()
@@ -478,8 +325,8 @@ def upload_report(request):
         return render_to_response('viewer/report/upload_report.html', context,
                                   context_instance=RequestContext(request))
 
-# @user_passes_test(in_proj_user_group)
-@permission_required('viewer.change_report', login_url='/viewer/restricted/')
+
+@permission_required('viewer.change_report', login_url=reverse_lazy('viewer_restricted'))
 def edit_report(request, report_id):
     if request.method == 'POST':
         r = Report.objects.get(pk=report_id)
@@ -491,11 +338,11 @@ def edit_report(request, report_id):
         if updated_form.is_valid():
             updated_form.save()
             report_parser.load_into_db(r)
-            return HttpResponseRedirect('/viewer/report')
+            return HttpResponseRedirect(reverse('manage_report'))
     else:
         project_pk = request.session.get('viewing_project', None)
         if project_pk is None:
-            return HttpResponseRedirect('/viewer/error/no_project')
+            return HttpResponseRedirect(reverse('no_project'))
         project = Project.objects.get(pk=project_pk)
         report_obj = Report.objects.get(pk=report_id)
         rform = ReportForm(instance=report_obj)
@@ -507,7 +354,7 @@ def edit_report(request, report_id):
         return render_to_response('viewer/report/edit_report.html', context,
                                   context_instance=RequestContext(request))
 
-# @user_passes_test(in_proj_user_group)
+
 @login_required
 def view_report(request, file_id):
     # build context from file
@@ -536,11 +383,12 @@ def view_report(request, file_id):
                'report_obj': report_obj}
     return render(request, 'viewer/report/view_report.html', context)
 
-@permission_required('viewer.delete_report', login_url='/viewer/restricted/')
+
+@permission_required('viewer.delete_report', login_url=reverse_lazy('viewer_restricted'))
 def delete_report(request, report_id):
     if request.method == 'POST':
         Report.objects.get(pk=report_id).delete()
-        return HttpResponseRedirect('/viewer/report/')
+        return HttpResponseRedirect(reverse('manage_report'))
     else:
         report_obj = Report.objects.get(pk=report_id)
         context = {'name': report_obj.report_file.name.strip('./'), 'pk': report_obj.pk}
@@ -549,11 +397,14 @@ def delete_report(request, report_id):
 '''
 Contact model
 '''
-@user_passes_test(in_proj_user_group)
+# TODO Need to decide whether this model matters or not
+
+
+@login_required
 def manage_contact(request, set_viewing_project_pk=None):
     project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
     if project_pk is None:
-        return HttpResponseRedirect('/viewer/error/no_project')
+        return HttpResponseRedirect(reverse('no_project'))
     project = Project.objects.get(pk=project_pk)
     context = {
         'contacts': project.contact_set.all(),
@@ -562,17 +413,18 @@ def manage_contact(request, set_viewing_project_pk=None):
     context.update(csrf(request))
     return render(request, 'viewer/contact/manage_contact.html', context)
 
-@user_passes_test(in_proj_user_group)
+
+@login_required
 def new_contact(request):
     if request.method == 'POST':
         contact_form = ContactForm(request.POST, instance=Contact())
         if contact_form.is_valid():
             contact_form.save()
-        return HttpResponseRedirect('/viewer/contact/')
+        return HttpResponseRedirect(reverse('manage_contact'))
     else:
         project_pk = request.session.get('viewing_project', None)
         if project_pk is None:
-            return HttpResponseRedirect('/viewer/error/no_project')
+            return HttpResponseRedirect(reverse('no_project'))
         contact_form = ContactForm(instance=Contact(), initial={'project': project_pk})
         context = {
             'contact_form': contact_form,
@@ -582,17 +434,18 @@ def new_contact(request):
         return render_to_response('viewer/contact/new_contact.html', context,
                                   context_instance=RequestContext(request))\
 
-@user_passes_test(in_proj_user_group)
+
+@login_required
 def new_contact_from_share(request):
     if request.method == 'POST':
         contact_form = ContactForm(request.POST, instance=Contact())
         if contact_form.is_valid():
             contact_form.save()
-        return HttpResponseRedirect('/viewer/contact/')
+        return HttpResponseRedirect(reverse('manage_contact'))
     else:
         project_pk = request.session.get('viewing_project', None)
         if project_pk is None:
-            return HttpResponseRedirect('/viewer/error/no_project')
+            return HttpResponseRedirect(reverse('no_project'))
         contact_form = ContactForm(instance=Contact(), initial={'project': project_pk})
         context = {
             'contact_form': contact_form,
@@ -602,18 +455,18 @@ def new_contact_from_share(request):
         return render_to_response('viewer/contact/new_contact_from_share.html', context,
                                   context_instance=RequestContext(request))
 
-@user_passes_test(in_proj_user_group)
+@login_required
 def edit_contact(request, contact_id):
     if request.method == 'POST':
         contact = Contact.objects.get(pk=contact_id)
         updated_form = ContactForm(request.POST, instance=contact)
         if updated_form.is_valid():
             updated_form.save()
-            return HttpResponseRedirect('/viewer/contact/')
+            return HttpResponseRedirect(reverse('manage_contact'))
     else:
         project_pk = request.session.get('viewing_project', None)
         if project_pk is None:
-            return HttpResponseRedirect('/viewer/error/no_project')
+            return HttpResponseRedirect(reverse('no_project'))
         contact = Contact.objects.get(pk=contact_id)
         contact_form = ContactForm(instance=contact)
         context = {
@@ -626,18 +479,19 @@ def edit_contact(request, contact_id):
         return render_to_response('viewer/contact/edit_contact.html', context,
                                   context_instance=RequestContext(request))
 
-@user_passes_test(in_proj_user_group)
+
+@login_required
 def delete_contact(request, contact_id):
     if request.method == 'POST':
         Contact.objects.get(pk=contact_id).delete()
-        return HttpResponseRedirect('/viewer/contact/')
+        return HttpResponseRedirect(reverse('manage_contact'))
     else:
         contact = Contact.objects.get(pk=contact_id)
         context = {'name': contact.full_name, 'pk': contact.pk}
         context.update(csrf(request))
         return render(request, 'viewer/contact/delete_contact.html', context)
 
-
+@csrf_exempt
 def get_contacts_json(request, project_id):
     contacts = Project.objects.get(pk=project_id).contact_set.all()
     contacts_json = {}
@@ -648,11 +502,13 @@ def get_contacts_json(request, project_id):
 '''
 Search functions
 '''
-@user_passes_test(in_proj_user_group)
+
+
+@login_required
 def search_reports(request, set_viewing_project_pk=None):
     project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
     if project_pk is None:
-        return HttpResponseRedirect('/viewer/error/no_project/')
+        return HttpResponseRedirect(reverse('no_project'))
     variant_fields = Variant._meta.get_all_field_names()
     num_reports = len(list(set(Variant.objects.values_list('report', flat=True).filter(report__study__project__pk=project_pk))))
     context = {
@@ -663,12 +519,12 @@ def search_reports(request, set_viewing_project_pk=None):
     return render(request, 'viewer/search/search_reports.html', context)
 
 
-@user_passes_test(in_proj_user_group)
+@login_required
 @csrf_exempt
 def ajax_search_reports(request, search_col, search_term, search_type):
     project_pk = request.session.get('viewing_project', None)
     if project_pk is None:
-        return HttpResponseRedirect('/viewer/error/no_project/')
+        return HttpResponseRedirect(reverse('no_project'))
     db_lookup = '__'.join([search_col, search_type])
     variants = Variant.objects.all()
     if request.POST.get('report_ids'):
@@ -676,20 +532,20 @@ def ajax_search_reports(request, search_col, search_term, search_type):
         variants = variants.filter(report_id__in=report_ids)
     variants = (variants.filter(report__study__project__pk=project_pk)
                 .filter(**{db_lookup: search_term}))
-
-
     return HttpResponse(report_parser.json_from_ajax(variants))
 
 '''
 Shared Reports
 '''
+
+
 def view_shared_data(request, shared_data_uuid):
     shared_report = SharedData.objects.filter(uuid__iexact=shared_data_uuid)
     if len(shared_report) == 0:
-        return HttpResponse('/viewer/error/shared_data_dne/')
+        return HttpResponse(reverse('shared_data_dne'))
     shared_report = shared_report[0]
     if shared_report.inactive_date < datetime.date.today():
-        return HttpResponse('/viewer/error/shared_data_expired/')
+        return HttpResponse(reverse('shared_data_expired'))
 
     field_lookup = simplejson.loads(shared_report.field_lookup)
     variants = Variant.objects.filter(**field_lookup)
@@ -704,8 +560,10 @@ def view_shared_data(request, shared_data_uuid):
                'shared_data_name': shared_report.name}
     return render(request, 'viewer/report/view_report.html', context)
 
+
 def view_share_data_expired(request):
     return render(request, 'viewer/error/share_data_expired.html')
+
 
 def view_share_data_dne(request):
     return render(request, 'viewer/error/share_data_dne.html')
@@ -744,7 +602,7 @@ def view_share_data_dne(request):
 #     else:
 #         project_pk = request.session.get('viewing_project', None)
 #         if project_pk is None:
-#             return HttpResponseRedirect('/viewer/error/no_project')
+#             return HttpResponseRedirect(reverse('no_project)
 #         report = Report.objects.get(pk=report_id)
 #         shared_data_form = SharedDataForm(instance=SharedData(), initial={
 #             'field_lookup': simplejson.dumps({'report_id': report_id})
@@ -773,21 +631,22 @@ def new_shared_data(request):
             shared_data_form.save()
         return HttpResponseRedirect
 
-def manage_address_book(request):
-    return render()
-
 
 '''
 Errors
 '''
+
+
+@login_required
 def no_project(request):
     return render(request, 'viewer/error/no_project.html')
-
 
 '''
 Util functions
 '''
-@user_passes_test(in_proj_user_group)
+
+
+@login_required
 def get_samples(request, study_id=None, **kwargs):
     sample_dict = {}
     if study_id:
@@ -799,7 +658,7 @@ def get_samples(request, study_id=None, **kwargs):
                         content_type="application/json")
 
 
-@user_passes_test(in_proj_user_group)
+@login_required
 def get_bnids_by_study(request, study_id=None):
     print "study_id: {}".format(study_id)
     bnid_dict = dict()
@@ -814,15 +673,15 @@ def get_bnids_by_study(request, study_id=None):
                         content_type="application/json")
 
 
-@user_passes_test(in_proj_user_group)
+@login_required
 def load_variants(request, report_id=None):
     print "Load Variants for Report ID: {}".format(report_id)
     report_obj = Report.objects.get(pk=report_id)
     report_parser.load_into_db(report_obj)
-    return HttpResponseRedirect('/viewer/report/')
+    return HttpResponseRedirect(reverse('manage_report'))
 
 
-@user_passes_test(in_proj_user_group)
+login_required
 def get_all_projects(request):
     project_dict = {}
     for p in Project.objects.all():
@@ -868,7 +727,7 @@ def populate_sidebar(request):
         # print nav_data
         if len(nav_data) == 0:
             return HttpResponse('<li><a href="#">No Projects Available</a></li>')
-        return render(request, 'viewer/project_dropdowns.html', {'projects': nav_data})
+        return render(request, 'viewer/sidebar/project_dropdowns.html', {'projects': nav_data})
     return HttpResponse('')
 
 
@@ -959,7 +818,7 @@ def get_series_data(request):
     }
     return HttpResponse(simplejson.dumps(context))
 
-@user_passes_test(in_proj_user_group)
+# @user_passes_test(in_proj_user_group)
 def share_report(request):
     if request.method == 'POST':
         shared_data_form = SharedDataForm(request.POST, instance=SharedData())
@@ -986,14 +845,14 @@ def share_report(request):
             # send_mail(subject, message, 'no-reply@uchicago.edu',
             #           recipients, fail_silently=False)
 
-        return HttpResponseRedirect('/viewer/report/')
+        return HttpResponseRedirect(reverse('manage_report'))
             # I don't know that we should necessarily redirect
             # Maybe just close the modal box, return to page?
             # but then how do we assure success? Or report failure? TODO
     else:
         project_pk = request.session.get('viewing_project', None)
         if project_pk is None:
-            return HttpResponseRedirect('/viewer/error/no_project')
+            return HttpResponseRedirect(reverse('no_project'))
         report_ids = request.GET.getlist('reportid')
         reports = Report.objects.filter(pk__in=report_ids)
         shared_data_form = SharedDataForm(instance=SharedData(), initial={

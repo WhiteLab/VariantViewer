@@ -1,6 +1,6 @@
 <div class="container">
 	<h2>Edit Study: {{ name }}</h2>
-    <form enctype="multipart/form-data" method="post" action="/viewer/study/edit_study/{{ pk }}/">
+    <form enctype="multipart/form-data" method="post" action="{% url 'edit_study' pk %}">
 		{% csrf_token %}
         {% for field in study_form %}
         <div class="row" style="margin-bottom:8px">

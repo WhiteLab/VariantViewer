@@ -1,4 +1,17 @@
+html{
+    height: 100%;
+}
 
+body{
+    background-color: #FBFCFD;
+    height: 100%;
+}
+
+.viewer-box{
+    padding:50px;
+    background-color:rgba(220,220,225,0.85);
+    border-radius:12px
+}
 
 .igsbviewer-modal-edit-button,
 .igsbviewer-modal-delete-button,

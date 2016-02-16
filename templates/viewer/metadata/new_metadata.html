@@ -1,6 +1,6 @@
 <div class="container">
 	<h2>Create a New Metadatas | {{ project_name }}</h2>
-    <form action="/viewer/metadata/new_metadata/" method="post">
+    <form action="{% url 'new_metadata' %}" method="post">
         {% csrf_token %}
         <div id="new-metadata-sheet"></div><br/>
         <button class="btn btn-primary" id="new-metadata-btn">Create</button>

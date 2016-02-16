@@ -135,7 +135,6 @@ $(document).ready(function(){
             return false;
             // Do something more informative? TODO
         }
-        console.log(reportIds);
 
         $.get('/viewer/report/zip-and-download/', {reportids: reportIds}, function(data){
             window.location.href = data;

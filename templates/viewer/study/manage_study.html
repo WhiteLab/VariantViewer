@@ -7,7 +7,7 @@ $(document).ready(function(){
     new jBox('Modal', {
         attach: $('.igsbviewer-modal-add-button'),
         ajax: {
-            url: '/viewer/study/new_study'
+            url: '{% url 'new_study' %}'
         },
         overlay: true,
         closeOnClick: 'overlay',

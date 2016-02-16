@@ -1,7 +1,7 @@
 {% extends "viewer/base.html" %}
 {% load staticfiles %}
 {% block extra_js %}
-    <script src="{% static 'js/handsontable.full.min.js' %}"></script>
+    <script src="{% static 'js/lib/handsontable.full.min.js' %}"></script>
     <link rel="stylesheet" media="screen" href="{% static 'css/handsontable.full.css' %}">
 <script type="text/javascript">
 $(document).ready(function(){
@@ -9,7 +9,7 @@ $(document).ready(function(){
     new jBox('Modal', {
         attach: $('.igsbviewer-modal-add-button'),
         ajax: {
-            url: '/viewer/metadata/new_metadata'
+            url: '{% url 'new_metadata' %}'
         },
         overlay: true,
         closeOnClick: 'overlay',

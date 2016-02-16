@@ -1,0 +1,61 @@
+{% load staticfiles %}
+<nav id="msidebar" class="sidebar sidebar-default sidebar-fixed-left" role="navigation">
+
+    <!-- Sidebar header -->
+    <div class="sidebar-header header-cover" style="background-color: #2c3e50">
+        <!-- Top bar -->
+        <div class="top-bar"></div>
+        <!-- Sidebar toggle button -->
+{#        <button type="button" class="sidebar-toggle">#}
+{#            <i class="fa fa-shopping-cart"></i>#}
+{#        </button>#}
+        <!-- Sidebar brand image -->
+        <div class="sidebar-image"><img style="display:inline-block;max-height:64px;margin-left:12px" src="{% static 'img/blue_logo.png' %}"></div>
+        <!-- Sidebar brand name -->
+        <a data-target="#top" class="sidebar-brand sidebar-dropdown-toggle" href="#">Variant Viewer
+            {{ user.first_name }} {{ user.last_name }}
+            <b class="caret"></b>
+        </a>
+    </div>
+
+    <!-- Sidebar navigation -->
+    <ul class="nav sidebar-nav">
+        <li class="dropdown2">
+            <ul class="dropdown-menu sidebar-dropdown-menu" id="top">
+                <li>
+                    <a href="{% url 'viewer_change_password' %}" tabindex="-1">
+                        Change Password
+                    </a>
+                </li>
+                <li>
+                    <a href="#" tabindex="-1">
+                        Help
+                    </a>
+                </li>
+                <li class="divider"></li>
+            </ul>
+        </li>
+        <li id="projects_dropdowns"></li>
+        {% if user.is_authenticated %}
+        <li class="divider"></li>
+        {% endif %}
+        <li>
+            {% if user.is_authenticated %}
+            <a href="{% url 'viewer_logout' %}">
+                <i class="sidebar-icon fa fa-sign-out"></i>
+                Logout
+            </a>
+            {% else %}
+            <a href="{% url 'viewer_login' %}">
+                <i class="sidebar-icon fa fa-sign-in"></i>
+                Login
+            </a>
+            {% endif %}
+        </li>
+    </ul>
+    <!-- Sidebar divider -->
+    <!-- <div class="sidebar-divider"></div> -->
+
+    <!-- Sidebar text -->
+    <!--  <div class="sidebar-text">Text</div> -->
+</nav>

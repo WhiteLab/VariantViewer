@@ -1,36 +1,31 @@
 from django.conf.urls import patterns, url
 from django.conf import settings
 from django.conf.urls.static import static
-from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
 
 import views
 
 urlpatterns = patterns('',
                        # Access pages
-                       url(r'^$', views.index, name='index'),
-                       url(r'^register/$', views.register, name='register'),
-                       url(r'^login/$', views.user_login, name='login'),
-                       url(r'^logout/$', views.user_logout, name='logout'),
+                       url(r'^$', views.index, name='viewer_index'),
+                       url(r'^register/$', views.register, name='viewer_register'),
+                       url(r'^login/$', views.user_login, name='viewer_login'),
+                       url(r'^logout/$', views.user_logout, name='viewer_logout'),
                        url(r'^restricted/$', views.restricted,
-                           name='restricted'),
-                       url(r'^permission/$', views.permission,
-                           name='permission'),
+                           name='viewer_restricted'),
                        url(r'^users/change-password/', 'django.contrib.auth.views.password_change',
                            {
-                               'template_name': 'viewer/change_password.html',
+                               'template_name': 'viewer/user/change_password.html',
                                'post_change_redirect': '/viewer/users/change-password-done/',
-                           }, name='change-password'),
+                           }, name='viewer_change_password'),
                        url(r'^users/change-password-done/', 'django.contrib.auth.views.password_change_done',
                            {
-                               'template_name': 'viewer/change_password_done.html'
+                               'template_name': 'viewer/user/change_password_done.html'
                            }, name='change-password-done'),
 
                        url(r'^populate-sidebar/$', views.populate_sidebar, name='populate_sidebar'),
 
                        # Errors
                        url(r'^error/no_project/$', views.no_project, name='no_project'),
-                       url(r'^error/not-found/$', lambda request: render(request, 'viewer/error/404_error.html')),
 
                        # Project
                        url(r'^project/$', views.manage_project,
@@ -44,29 +39,11 @@ urlpatterns = patterns('',
 
 
                        # Bnid
-                       url(r'^bnid/$',
-                           views.manage_bnid, name='manage_bnid'),
-                       url(r'^bnid/(?P<set_viewing_project_pk>\d+)/$', views.manage_bnid,
-                           name='manage_bnid_set_viewing_project_pk'),
-                       url(r'^bnid/new_bnid/$',
-                           views.new_bnid, name='new_bnid'),
-                       url(r'^bnid/edit_bnid/(?P<bnid_id>\d+)/$',
-                           views.edit_bnid, name='edit_bnid'),
-                       url(r'^bnid/delete_bnid/(?P<bnid_id>\d+)/$',
-                           views.delete_bnid, name='delete_bnid'),
                        url(r'^get_bnids_by_study/(?P<study_id>\d+)/$',
                            views.get_bnids_by_study, name='get_bnids_by_study'),
 
 
                        # Sample
-                       url(r'^sample/$', views.manage_sample,
-                           name='manage_sample'),
-                       url(r'^sample/(?P<set_viewing_project_pk>\d+)/$', views.manage_sample,
-                           name='manage_sample_set_viewing_project_pk'),
-                       url(r'^sample/new_sample/$', views.new_sample,
-                           name='new_sample'),
-                       url(r'edit_sample/(?P<sample_id>\d+)/$', views.edit_sample,
-                           name='edit_sample'),
                        url(r'delete_sample/(?P<sample_id>\d+)/$', views.delete_sample,
                            name='delete_sample'),
                        url(r'^get_samples/(?P<study_id>\d+)/$', views.get_samples,
@@ -110,9 +87,9 @@ urlpatterns = patterns('',
                            name='view_shared_data'),
                        url(r'^shared/share_report/$', views.share_report, name='share_report_post'),
                        # url(r'^shared/share_report/(?P<report_id>\d+)/$', views.share_report, name='share_report'),
-                       url(r'^error/share_data_expired/$',
-                           views.view_share_data_expired, name='view_shared_data_expired'),
-                       url(r'^error/share_data_dne/$', views.view_share_data_dne, name='share_report'),
+                       url(r'^error/shared_data_expired/$',
+                           views.view_share_data_expired, name='shared_data_expired'),
+                       url(r'^error/shared_data_dne/$', views.view_share_data_dne, name='shared_data_dne'),
 
                        url(r'^files/(?P<path>.*)$',
                            'django.views.static.serve',
@@ -152,5 +129,3 @@ urlpatterns = patterns('',
                        url(r'^get_series_data/$', views.get_series_data, name='get_series_data')
 
                        ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-

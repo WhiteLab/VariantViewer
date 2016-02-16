@@ -2,7 +2,7 @@
 	<h2>Delete Variant Report: {{ name }}</h2>
     <p>Are you sure you want to delete '{{ name }}'?<br/>
     This will also delete everything associated with this Variant Report.</p>
-    <form enctype="multipart/form-data" method="post" action="/viewer/report/delete_report/{{ pk }}/">
+    <form enctype="multipart/form-data" method="post" action="{% url 'delete_report' pk %}">
 		{% csrf_token %}
         <div class="row">
             <div class="col-xs-12">

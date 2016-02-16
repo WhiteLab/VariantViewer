@@ -1,6 +1,6 @@
 <div class="container">
 	<h2>Edit Project: {{ name }}</h2>
-    <form enctype="multipart/form-data" method="post" action="/viewer/project/edit_project/{{ pk }}/">
+    <form enctype="multipart/form-data" method="post" action="{% url 'edit_project' pk %}">
 		{% csrf_token %}
         {% for field in project_form %}
         <div class="row" style="margin-bottom:8px">

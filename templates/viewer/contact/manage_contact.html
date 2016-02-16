@@ -7,7 +7,7 @@ $(document).ready(function(){
     new jBox('Modal', {
         attach: $('.igsbviewer-modal-add-button'),
         ajax: {
-            url: '/viewer/contact/new_contact/'
+            url: '{% url 'new_contact' %}'
         },
         overlay: true,
         closeOnClick: 'overlay',
@@ -38,7 +38,7 @@ $(document).ready(function(){
     });
     new jBox('Modal', {
         onOpen: function(){
-            this.options.ajax.url = '/viewer/contact/delete_contact/' + pk;
+            this.options.ajax.url = '/viewer/contact/delete_contact' + pk;
         },
         ajax: {
             reload: true

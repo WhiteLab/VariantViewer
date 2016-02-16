@@ -43,9 +43,11 @@ class VariantAdmin(admin.ModelAdmin):
                     'normal_ref_count', 'normal_alt_count', 'tumor_ref_count',
                     'tumor_alt_count')
 
+
 class ContactAdmin(admin.ModelAdmin):
     model = Contact
     list_display = ('full_name', 'email', 'project')
+
 
 class SharedDataAdmin(admin.ModelAdmin):
     model = SharedData

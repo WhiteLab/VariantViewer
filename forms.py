@@ -7,9 +7,17 @@ from django.contrib.auth.models import User
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())
 
+    def __init__(self, *args, **kwargs):
+        super(UserForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+            })
+
     class Meta:
         model = User
         fields = ['username', 'email', 'first_name', 'last_name', 'password']
+
 
 class ProjectForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -22,40 +30,6 @@ class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
         fields = ['name', 'description']
-        widgets = {'description': forms.Textarea(attrs={'cols': 30,
-                                                        'rows': 6,
-                                                        'style': 'resize:none'}),}
-
-
-class BnidForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super(BnidForm, self).__init__(*args, **kwargs)
-        for field in self.fields:
-            self.fields[field].widget.attrs.update({
-                'class': 'form-control'
-            })
-
-    class Meta:
-        model = Bnid
-        fields = ['sample', 'bnid', 'description']
-        widgets = {'description': forms.Textarea(attrs={'cols': 30,
-                                                        'rows': 6,
-                                                        'style': 'resize:none'}),}
-
-
-class SampleForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super(SampleForm, self).__init__(*args, **kwargs)
-        for field in self.fields:
-            self.fields[field].widget.attrs.update({
-                'class': 'form-control'
-            })
-        # self.fields['study'].queryset = Project.objects.get(pk=kwargs['project_pk']).study_set.all()
-
-
-    class Meta:
-        model = Sample
-        fields = ['study', 'name', 'description', 'cellularity']
         widgets = {'description': forms.Textarea(attrs={'cols': 30,
                                                         'rows': 6,
                                                         'style': 'resize:none'}),}
@@ -105,6 +79,7 @@ class StudyForm(forms.ModelForm):
                                                         'style': 'resize:none'}),
                    'project': forms.HiddenInput()
                   }
+
 
 class StudySelectorForm(forms.Form):
 

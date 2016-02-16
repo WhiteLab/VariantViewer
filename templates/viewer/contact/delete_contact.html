@@ -1,7 +1,7 @@
 <div class="container">
 	<h2>Delete Contact: {{ name }}</h2>
     <p>Are you sure you want to delete '{{ name }}'?
-    <form enctype="multipart/form-data" method="post" action="/viewer/contact/delete_contact/{{ pk }}/">
+    <form enctype="multipart/form-data" method="post" action="{% url 'delete_contact' pk %}">
 		{% csrf_token %}
         <div class="row">
             <div class="col-xs-12">

@@ -1,0 +1,62 @@
+{% extends "viewer/base.html" %}
+{% load staticfiles %}
+
+{% block extra_js %}
+<script src="{% static 'js/register/register.js' %}"></script>
+<style>
+input[type="radio"]{
+    transform: scale(1.25);
+}
+</style>
+{% endblock extra_js %}
+
+{% block content %}
+<div class="container" style="padding: 50px">
+	<h1>Variant Report Viewer</h1>
+	<h2>Account registration</h2>
+	{% if registered %}
+    <br><strong>Thank you for registering.</strong>  An email has been sent to the
+    <a href="mailto:{{ viewer_admin_email }}">site administrator</a>. You will be able to log
+    in to the site once your account has been approved.
+	{% else %}
+	<form id="user_form" method="POST" action="{% url 'viewer_register' %}"
+		enctype="multipart/form-data">
+		{% csrf_token %}
+        {% for field in user_form %}
+        <div class="row" style="margin-bottom:8px;">
+            <div class="col-sm-2">
+                {{ field.label_tag }}
+            </div>
+            <div class="col-sm-6">
+                {{ field }}
+            </div>
+        </div>
+        {% endfor %}
+        <div class="row" style="margin-bottom:8px;">
+            <div class="col-sm-2">
+                <label for="password_confirm">Confirm Password:</label>
+            </div>
+            <div class="col-sm-6">
+                <input class="form-control" id="password_confirm" type="password">
+            </div>
+        </div>
+        I would like to be:<br/>
+        <input type="radio" name="user_type" id="user_type_admin" value="admin">
+        <label for="user_type_admin">&nbsp;&nbsp;Administrative User</label><br/>
+        <input type="radio" name="user_type" id="user_type_project" value="project">
+        <label for="user_type_project">&nbsp;&nbsp;Project User</label><br/>
+        <input type="radio" name="user_type" id="user_type_external" value="external">
+        <label for="user_type_external">&nbsp;&nbsp;External User</label><br/><br/>
+        <div class="row">
+            <button type="button" class="btn btn-small btn-primary" id="register_submit">
+                <img style="display:inline-block;max-height:30px" src="{% static 'img/blue_logo.png' %}">
+                &nbsp;&nbsp;Register
+            </button>
+            <span id="passwords_do_not_match" style="display:none">
+                <span style="color:#8FA8C1;margin-left:12px;">Passwords do not match.</span>
+            </span>
+        </div>
+	</form>
+	{% endif %}
+</div>
+{% endblock %}

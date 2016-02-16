@@ -10,7 +10,7 @@
 <!-- Modal box content -->
 <div class="container" id="modal_box" style="display:none">
 	<h2>Upload a New Variant Report</h2>
-	<form name='upload_report_form' action="/viewer/upload_report/" method="post" enctype="multipart/form-data">
+	<form name='upload_report_form' action="{% url 'upload_report' %}" method="post" enctype="multipart/form-data">
 		{% csrf_token %}
         {% for field in report_form %}
         <div class="row" style="margin-bottom:8px">

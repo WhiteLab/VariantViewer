@@ -1,28 +1,44 @@
 {% extends "viewer/base.html" %}
+{% load staticfiles %}
 
 {% block content %}
-<div class="container" style="padding: 50px; text-align: 'center';">
-	<h1>Variant Report Viewer</h1>
-	{% if user.is_authenticated %}
-	<p>Hello, {{ user.first_name }}!</p>
-	{% endif %}
-</div>
-<div class="container" style="padding: 50px; background-color: #BBB; border-radius: 15px;  -webkit-border-radius: 15px; -moz-border-radius:15px;">
-	<p>
+<style>
+body{
+    background-image: url('{% static 'img/campus_city_lake_1280x800.jpg' %}');
+    background-size: cover;
+}
+</style>
+<div class="container">
+    <div class="row viewer-box" style="margin-top:100px">
+        <h1 style="margin-top:0;text-align:center">Variant Report Viewer</h1>
+        {% if user.is_authenticated %}
+        <p>Hello, {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}!</p>
+        {% endif %}
+        <p>
 		The purpose of this tool is to provide a way to store, organize, view, and
-		eventually <i>search</i> Variant data from user-uploaded files.  Each Study
+		eventually search Variant data from user-uploaded files.  Each Study
 		(e.g. a single patient, VIP, etc.) can contain many Samples.  Each of these
 		samples may be represented by one or many NGS libraries identified by Bionimbus
 		IDs.  The Variant Report resulting from the comparison of 2 Bionimbus IDs,
 		such as a Tumor/Normal pair, can be loaded into this service.
-	</p>
-	<p style="text-align: center"><a href="/viewer/register/">Register Here</a></p>
+	    </p>
+	    <p style="text-align:center;margin-top:50px">
+            {% if not user.is_authenticated %}
+            <a href="{% url 'viewer_login' %}">
+                <button class="btn btn-small btn-primary" style="margin-right:25px;">
+                    <span class="fa fa-2x fa-sign-in"></span>
+                    <span style="position:relative;top:-6px">&nbsp;&nbsp;Login</span>
+                </button>
+            </a>
+            <a href="{% url 'viewer_register' %}">
+                <button class="btn btn-small btn-primary">
+                    <img style="display:inline-block;max-height:30px" src="{% static 'img/blue_logo.png' %}">
+                    &nbsp;&nbsp;Register Here
+                </button>
+            </a>
+            {% endif %}
 
+        </p>
+    </div>
 </div>
-<div class="container">
-	<p>
-	</p>
-</div>
-
-
 {% endblock %}
