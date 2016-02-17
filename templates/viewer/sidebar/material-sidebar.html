@@ -12,8 +12,9 @@
         <!-- Sidebar brand image -->
         <div class="sidebar-image"><img style="display:inline-block;max-height:64px;margin-left:12px" src="{% static 'img/blue_logo.png' %}"></div>
         <!-- Sidebar brand name -->
-        <a data-target="#top" class="sidebar-brand sidebar-dropdown-toggle" href="#">Variant Viewer
-            {{ user.first_name }} {{ user.last_name }}
+        <a data-target="#top" class="sidebar-brand sidebar-dropdown-toggle" href="#">
+            {% if not user.first_name %}Variant Viewer{% else %}
+            {{ user.first_name }} {{ user.last_name }}{% endif %}
             <b class="caret"></b>
         </a>
     </div>
