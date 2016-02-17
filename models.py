@@ -7,7 +7,7 @@ import datetime
 class Project(models.Model):
     name = models.CharField(max_length=64, verbose_name="Project Name")
     description = models.CharField(max_length=2048,
-                                   verbose_name="Project Description")
+                                   verbose_name="Project Description", blank=True)
     creation_date = models.DateTimeField('Date Created', auto_now=True,
                                          blank=True)
     user = models.ManyToManyField(User, blank=True,
@@ -152,5 +152,10 @@ class SharedData(models.Model):
 
 class HotListGene(models.Model):
     name = models.CharField(max_length=32, verbose_name='HotList Gene Name')
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    viewable_studies = models.ManyToManyField(Study)
 
 

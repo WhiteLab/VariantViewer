@@ -1,11 +1,11 @@
 from django.contrib import admin
-from models import Project, Bnid, Sample, Study, Caller, Report, Variant, \
-    Genome, Contact, SharedData
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from models import *
 
 
 class ProjectAdmin(admin.ModelAdmin):
     model = Project
-    list_display = ('id', 'name', 'description', 'creation_date')
+    list_display = ('name', 'description', 'creation_date')
     filter_horizontal = ('user', )
 
 
@@ -53,6 +53,13 @@ class SharedDataAdmin(admin.ModelAdmin):
     model = SharedData
     list_display = ('uuid', 'field_lookup', 'user', 'creation_date', 'inactive_date')
 
+class UserProfileInline(admin.StackedInline):
+    model = UserProfile
+    can_delete = False
+
+class UserAdmin(BaseUserAdmin):
+    inlines = (UserProfileInline,)
+
 admin.site.register(Project, ProjectAdmin)
 admin.site.register(Sample, SampleAdmin)
 admin.site.register(Bnid, BnidAdmin)
@@ -63,3 +70,6 @@ admin.site.register(Genome, GenomeAdmin)
 admin.site.register(Variant, VariantAdmin)
 admin.site.register(Contact, ContactAdmin)
 admin.site.register(SharedData, SharedDataAdmin)
+
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)

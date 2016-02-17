@@ -99,7 +99,7 @@ class Migration(migrations.Migration):
             name='Sample',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('name', models.CharField(max_length=48, verbose_name=b'Sample Name')),
+                ('name', models.CharField(unique=True, max_length=48, verbose_name=b'Sample Name')),
                 ('description', models.CharField(max_length=256, verbose_name=b'Sample Description', blank=True)),
                 ('cellularity', models.CharField(max_length=8, verbose_name=b'% Cellularity', blank=True)),
                 ('creation_date', models.DateTimeField(auto_now=True, verbose_name=b'Date Created')),
@@ -130,13 +130,24 @@ class Migration(migrations.Migration):
             name='Study',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('name', models.CharField(max_length=64, verbose_name=b'Study Name')),
+                ('name', models.CharField(unique=True, max_length=64, verbose_name=b'Study Name')),
                 ('description', models.CharField(max_length=256, verbose_name=b'Study Description', blank=True)),
                 ('creation_date', models.DateTimeField(auto_now=True, verbose_name=b'Date Created')),
                 ('project', models.ForeignKey(to='viewer.Project')),
             ],
             options={
                 'verbose_name_plural': 'Studies',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='UserProfile',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
+                ('viewable_studies', models.ManyToManyField(to='viewer.Study')),
+            ],
+            options={
             },
             bases=(models.Model,),
         ),

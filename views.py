@@ -225,9 +225,10 @@ def manage_metadata(request, set_viewing_project_pk=None):
     if project_pk is None:
         return HttpResponseRedirect(reverse('no_project'))
     project = Project.objects.get(pk=project_pk)
+    viewable_studies = request.user.userprofile.viewable_studies.all()
     context = {
         'project_name': project.name,
-        'samples': Sample.objects.filter(study__project__pk=project_pk)
+        'samples': Sample.objects.filter(study__project__pk=project_pk).filter(study__in=viewable_studies),
     }
     return render(request, 'viewer/metadata/manage_metadata.html', context)
 
@@ -289,8 +290,9 @@ def manage_report(request, set_viewing_project_pk=None):
     project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
     if project_pk is None:
         return HttpResponseRedirect(reverse('no_project'))
+    viewable_studies = request.user.userprofile.viewable_studies.all()
     context = {
-        'reports': Report.objects.filter(study__project__pk=project_pk),
+        'reports': Report.objects.filter(study__project__pk=project_pk).filter(study__in=viewable_studies),
         'project_name': Project.objects.get(pk=project_pk).name,
         'variant_fields': Variant._meta.get_all_field_names()
     }
