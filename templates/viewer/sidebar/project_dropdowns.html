@@ -7,20 +7,20 @@
     <ul class="dropdown-menu" id="{{ project.name }}_project_dropdown"{% if project.current %} style="display:block"{% endif %}>
         {% if perms.viewer.add_study %}
         <li>
-            <a href="{% url 'manage_study' project.pk %}" tabindex="-1">
+            <a href="{% url 'manage_study_set_viewing_project_pk' project.pk %}" tabindex="-1">
                 Studies
                 <span class="sidebar-badge">{{ project.studies }}</span>
             </a>
         </li>
         {% endif %}
         <li>
-            <a href="{% url 'manage_metadata' project.pk %}" tabindex="-1">
+            <a href="{% url 'manage_metadata_set_viewing_project_pk' project.pk %}" tabindex="-1">
                 Metadata
                 <span class="sidebar-badge">{{ project.samples }}</span>
             </a>
         </li>
         <li>
-            <a href="{% url 'manage_report' project.pk %}" tabindex="-1">
+            <a href="{% url 'manage_report_set_viewing_project_pk' project.pk %}" tabindex="-1">
                 Reports
                 <span class="sidebar-badge">{{ project.reports }}</span>
             </a>
