@@ -384,6 +384,22 @@ def view_report(request, file_id):
     return render(request, 'viewer/report/view_report.html', context)
 
 
+# get info to upload reports
+def report_info_get(request, bid):
+    try:
+        report_info = Bnid.objects.get(bnid=bid)
+    except:
+        return HttpResponse('{}')
+
+    #if report_info.bid is None:
+    #    return HttpResponse('{}')
+    json_response = {'sample': report_info.sample.name,
+                     'study': report_info.sample.study.name,
+                     'description': report_info.sample.description}
+
+    pretty = simplejson.dumps(json_response, sort_keys=True, indent=4)
+    return HttpResponse(pretty)
+
 @permission_required('viewer.delete_report', login_url=reverse_lazy('viewer_restricted'))
 def delete_report(request, report_id):
     if request.method == 'POST':
@@ -681,7 +697,7 @@ def load_variants(request, report_id=None):
     return HttpResponseRedirect(reverse('manage_report'))
 
 
-login_required
+@login_required
 def get_all_projects(request):
     project_dict = {}
     for p in Project.objects.all():
