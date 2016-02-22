@@ -388,8 +388,9 @@ def view_report(request, file_id):
 def report_info_get(request, bid):
     try:
         report_info = Bnid.objects.get(bnid=bid)
-    except:
-        return HttpResponse('{}')
+    except Exception as e:
+        error = {'Message': e.message}
+        return HttpResponse(simplejson.dumps(error))
 
     #if report_info.bid is None:
     #    return HttpResponse('{}')
