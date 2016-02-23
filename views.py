@@ -1,20 +1,18 @@
 import simplejson
-
+from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import permission_required, login_required
 from django.core.context_processors import csrf
 from django.core.mail import send_mail
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, render_to_response
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
-from django.core.urlresolvers import reverse, reverse_lazy
-from django.conf import settings
 
 from forms import (ProjectForm, ReportForm, StudyForm,
                    UserForm, SharedDataForm, ContactForm)
 from models import *
-
 from util import report_parser, render_charts
 
 
@@ -144,6 +142,7 @@ def edit_project(request, project_id):
                                   context,
                                   context_instance=RequestContext(request))
 
+
 '''
 Study model
 '''
@@ -213,6 +212,7 @@ def delete_study(request, study_id):
         context.update(csrf(request))
         return render_to_response('viewer/study/delete_study.html', context,
                                   context_instance=RequestContext(request))
+
 
 '''
 Merged Samples/BIDs into Metadata
@@ -298,12 +298,14 @@ def manage_report(request, set_viewing_project_pk=None):
     return render(request, 'viewer/report/manage_report.html', context)
 
 
-@permission_required('viewer.add_report', login_url=reverse_lazy('viewer_restricted'))
+# @permission_required('viewer.add_report', login_url=reverse_lazy('viewer_restricted'))
+@csrf_exempt
 def upload_report(request):
     if request.method == 'POST':
         print "POST from upload_report"
         if request.FILES:
             rform = ReportForm(request.POST, request.FILES)
+            print request.POST
         else:
             rform = ReportForm(request.POST)
         if rform.is_valid():
@@ -385,21 +387,40 @@ def view_report(request, file_id):
 
 
 # get info to upload reports
-def report_info_get(request, bid):
+@csrf_exempt
+def report_info_get(request):
+    import ast
     try:
+        info_req = ast.literal_eval(request.readlines()[0])
+        (bid, caller_name, genome_name) = (
+            info_req['bid'], info_req['caller'], info_req['genome'])
         report_info = Bnid.objects.get(bnid=bid)
+        caller_info = Caller.objects.get(name=caller_name)
+        genome_info = Genome.objects.get(name=genome_name)
+
+        bid_pk = report_info.pk
+        sample = report_info.sample.name
+        study = report_info.sample.study.pk
+        description = report_info.sample.description
+        caller_pk = caller_info.pk
+        genome_pk = genome_info.pk
+
+        json_response = {'bid_pk': bid_pk,
+                         'sample': sample,
+                         'study': study,
+                         'description': description,
+                         'caller_pk': caller_pk,
+                         'genome_pk': genome_pk}
+
+        pretty = simplejson.dumps(json_response, sort_keys=True, indent=4)
+        return HttpResponse(pretty)
     except Exception as e:
         error = {'Message': e.message}
         return HttpResponse(simplejson.dumps(error))
 
-    #if report_info.bid is None:
-    #    return HttpResponse('{}')
-    json_response = {'sample': report_info.sample.name,
-                     'study': report_info.sample.study.name,
-                     'description': report_info.sample.description}
+        # if report_info.bid is None:
+        #    return HttpResponse('{}')
 
-    pretty = simplejson.dumps(json_response, sort_keys=True, indent=4)
-    return HttpResponse(pretty)
 
 @permission_required('viewer.delete_report', login_url=reverse_lazy('viewer_restricted'))
 def delete_report(request, report_id):
@@ -411,9 +432,12 @@ def delete_report(request, report_id):
         context = {'name': report_obj.report_file.name.strip('./'), 'pk': report_obj.pk}
         return render(request, 'viewer/report/delete_report.html', context)
 
+
 '''
 Contact model
 '''
+
+
 # TODO Need to decide whether this model matters or not
 
 
@@ -449,7 +473,7 @@ def new_contact(request):
         }
         context.update(csrf(request))
         return render_to_response('viewer/contact/new_contact.html', context,
-                                  context_instance=RequestContext(request))\
+                                  context_instance=RequestContext(request))
 
 
 @login_required
@@ -471,6 +495,7 @@ def new_contact_from_share(request):
         context.update(csrf(request))
         return render_to_response('viewer/contact/new_contact_from_share.html', context,
                                   context_instance=RequestContext(request))
+
 
 @login_required
 def edit_contact(request, contact_id):
@@ -508,6 +533,7 @@ def delete_contact(request, contact_id):
         context.update(csrf(request))
         return render(request, 'viewer/contact/delete_contact.html', context)
 
+
 @csrf_exempt
 def get_contacts_json(request, project_id):
     contacts = Project.objects.get(pk=project_id).contact_set.all()
@@ -515,6 +541,7 @@ def get_contacts_json(request, project_id):
     for contact in contacts:
         contacts_json[contact.pk] = str(contact)
     return HttpResponse(simplejson.dumps(contacts_json))
+
 
 '''
 Search functions
@@ -527,9 +554,10 @@ def search_reports(request, set_viewing_project_pk=None):
     if project_pk is None:
         return HttpResponseRedirect(reverse('no_project'))
     variant_fields = Variant._meta.get_all_field_names()
-    num_reports = len(list(set(Variant.objects.values_list('report', flat=True).filter(report__study__project__pk=project_pk))))
+    num_reports = len(
+        list(set(Variant.objects.values_list('report', flat=True).filter(report__study__project__pk=project_pk))))
     context = {
-        'variant_fields':variant_fields,
+        'variant_fields': variant_fields,
         'num_reports': num_reports,
         'project_name': Project.objects.get(pk=project_pk).name
     }
@@ -550,6 +578,7 @@ def ajax_search_reports(request, search_col, search_term, search_type):
     variants = (variants.filter(report__study__project__pk=project_pk)
                 .filter(**{db_lookup: search_term}))
     return HttpResponse(report_parser.json_from_ajax(variants))
+
 
 '''
 Shared Reports
@@ -584,6 +613,7 @@ def view_share_data_expired(request):
 
 def view_share_data_dne(request):
     return render(request, 'viewer/error/share_data_dne.html')
+
 
 # @user_passes_test(in_proj_user_group)
 # def share_report(request, report_id=None):
@@ -657,6 +687,7 @@ Errors
 @login_required
 def no_project(request):
     return render(request, 'viewer/error/no_project.html')
+
 
 '''
 Util functions
@@ -757,9 +788,12 @@ def info_many(request):
     report_ids = request.GET.getlist('reportIds[]')
     return render(request, 'viewer/info/info.html', {'report_ids': simplejson.dumps(report_ids)})
 
+
 '''
 Cards functions
 '''
+
+
 def get_cards(request):
     context = {}
     card_names = request.GET.getlist('cards[]')
@@ -835,6 +869,7 @@ def get_series_data(request):
     }
     return HttpResponse(simplejson.dumps(context))
 
+
 # @user_passes_test(in_proj_user_group)
 def share_report(request):
     if request.method == 'POST':
@@ -863,9 +898,9 @@ def share_report(request):
             #           recipients, fail_silently=False)
 
         return HttpResponseRedirect(reverse('manage_report'))
-            # I don't know that we should necessarily redirect
-            # Maybe just close the modal box, return to page?
-            # but then how do we assure success? Or report failure? TODO
+        # I don't know that we should necessarily redirect
+        # Maybe just close the modal box, return to page?
+        # but then how do we assure success? Or report failure? TODO
     else:
         project_pk = request.session.get('viewing_project', None)
         if project_pk is None:
