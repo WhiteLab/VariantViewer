@@ -300,7 +300,7 @@ def load_into_db(report):
         return False
 
     media_path = get_media_path()
-    report_filename = report.report_file.name[2:]
+    report_filename = os.path.basename(report.report_file.name)
     print "{}/{}".format(media_path, report.report_file.name)
 
     checks_out = report_file_formatter(report_filename)

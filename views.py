@@ -305,11 +305,12 @@ def upload_report(request):
         print "POST from upload_report"
         if request.FILES:
             rform = ReportForm(request.POST, request.FILES)
-            print request.POST
         else:
             rform = ReportForm(request.POST)
         if rform.is_valid():
+            print dir(request.FILES)
             report = rform.save()
+            print report.report_file.name
             report_parser.load_into_db(report)
             return HttpResponseRedirect(reverse('manage_report'))
         else:
@@ -417,9 +418,6 @@ def report_info_get(request):
     except Exception as e:
         error = {'Message': e.message}
         return HttpResponse(simplejson.dumps(error))
-
-        # if report_info.bid is None:
-        #    return HttpResponse('{}')
 
 
 @permission_required('viewer.delete_report', login_url=reverse_lazy('viewer_restricted'))

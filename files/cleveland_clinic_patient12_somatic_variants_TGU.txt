@@ -1,6 +1,0 @@
-chr	pos	ref	alt	normal_ref_count	normal_alt_count	pct_normal_alt	tumor_ref_count	tumor_alt_count	pct_tumor_alt	tn_pct_alt_ratio	gene	context	dbsnp_id	effect	coding	codon_change	amino_acid_change	amino_acid_length	mutect_call	on/off-target	bid:tumor_normal	sample:tumor_normal
-chr11	18421041	G	T	86	0	None	80	6	None	None	LDHA			NON_SYNONYMOUS_CODING	CODING	Gat/Tat	D64Y	241			2014-1726_2014-1727	S06-57353-H3_S06-57353-H1
-chr12	133245428	T	G	192	0	None	186	6	None	None	POLE			NON_SYNONYMOUS_CODING	CODING	tAc/tCc	Y631S	2286			2014-1726_2014-1727	S06-57353-H3_S06-57353-H1
-chr17	33428365	C	T	99	0	None	73	4	None	None	RAD51D			NON_SYNONYMOUS_CODING	CODING	cGa/cAa	R141Q	216			2014-1726_2014-1727	S06-57353-H3_S06-57353-H1
-chr19	9064396	T	G	365	0	None	254	4	None	None	MUC16			NON_SYNONYMOUS_CODING	CODING	Acc/Ccc	T7684P	14507			2014-1726_2014-1727	S06-57353-H3_S06-57353-H1
-

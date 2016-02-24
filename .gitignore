@@ -17,6 +17,7 @@ eggs/
 .eggs/
 lib64/
 migrations/
+files/
 parts/
 sdist/
 var/
