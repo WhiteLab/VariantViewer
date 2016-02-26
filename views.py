@@ -298,8 +298,7 @@ def manage_report(request, set_viewing_project_pk=None):
     return render(request, 'viewer/report/manage_report.html', context)
 
 
-# @permission_required('viewer.add_report', login_url=reverse_lazy('viewer_restricted'))
-@csrf_exempt
+@permission_required('viewer.add_report', login_url=reverse_lazy('viewer_restricted'))
 def upload_report(request):
     if request.method == 'POST':
         print "POST from upload_report"
@@ -390,9 +389,8 @@ def view_report(request, file_id):
 # get info to upload reports
 @csrf_exempt
 def report_info_get(request):
-    import ast
     try:
-        info_req = ast.literal_eval(request.readlines()[0])
+        info_req = simplejson.loads(request.readlines()[0])
         (bid, caller_name, genome_name) = (
             info_req['bid'], info_req['caller'], info_req['genome'])
         report_info = Bnid.objects.get(bnid=bid)
