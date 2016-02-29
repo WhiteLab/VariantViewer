@@ -394,6 +394,8 @@ def report_info_get(request):
         (bid, caller_name, genome_name) = (
             info_req['bid'], info_req['caller'], info_req['genome'])
         report_info = Bnid.objects.get(bnid=bid)
+        caller_info = Caller.objects.get(name=caller_name)
+        genome_info = Genome.objects.get(name=genome_name)
 
         bid_pk = report_info.pk
         sample = report_info.sample.name
