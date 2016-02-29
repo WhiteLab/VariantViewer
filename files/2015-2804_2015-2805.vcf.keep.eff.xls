@@ -1,4 +1,4 @@
-chr	pos	context	ref	alt	normal_ref_count	normal_alt_count	pct_normal_alt	tumor_ref_count	tumor_alt_count	pct_tumor_alt	tn_pct_alt_ratio	dbsnp_id	gene	effect	coding	codon_change	amino_acid_change	amino_acid_length	mutect_call	on/off-target
+chr	pos	context	ref	alt	normal_ref_count	normal_alt_count	%_normal_alt	tumor_ref_count	tumor_alt_count	%_tumor_alt	T/N_%_alt_ratio	dbSnp_id	gene	effect	coding	codon_change	amino_acid_change	amino_acid_length	mutect_call	on/off-target
 chr1	16248740	TTTxAAG	A	T	419	20	4.56%	823	27	3.18%	0.70	NA	SPEN	INTRON	CODING			3664	KEEP	ON
 chr1	121484121	GAAxGAT	C	T	314	12	3.68%	95	5	5.00%	1.36	9701683		INTERGENIC					KEEP	OFF
 chr1	121484139	AGCxGAC	A	G	305	11	3.48%	81	6	6.90%	1.98	9988651		INTERGENIC					KEEP	OFF

@@ -1,7 +1,8 @@
-from django.db import models
-from django.contrib.auth.models import User
-from uuidfield import UUIDField
 import datetime
+
+from django.contrib.auth.models import User
+from django.db import models
+from uuidfield import UUIDField
 
 
 class Project(models.Model):
@@ -31,7 +32,6 @@ class Study(models.Model):
 
     class Meta:
         verbose_name_plural = 'Studies'
-
 
 
 class Caller(models.Model):
@@ -134,7 +134,7 @@ class SharedData(models.Model):
     name = models.CharField(max_length=128, verbose_name='Shared Data Name')
     description = models.TextField(verbose_name='Shared Data Description')
     uuid = UUIDField(auto=True, hyphenate=True, blank=True,
-                     null=True) # defaults to v.4
+                     null=True)  # defaults to v.4
     # report = models.ForeignKey(Report)
     field_lookup = models.TextField(verbose_name='Field Lookup JSON')
     creation_date = models.DateField(verbose_name='Creation Date',
@@ -149,6 +149,7 @@ class SharedData(models.Model):
 
     class Meta:
         verbose_name_plural = 'Shared Data'
+
 
 class HotListGene(models.Model):
     name = models.CharField(max_length=32, verbose_name='HotList Gene Name')
