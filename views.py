@@ -415,7 +415,7 @@ def report_info_get(request):
         return HttpResponse(pretty)
     except Exception as e:
         error = {'Message': e.message}
-        return HttpResponse(request)
+        return HttpResponse(error)
 
 
 @permission_required('viewer.delete_report', login_url=reverse_lazy('viewer_restricted'))
