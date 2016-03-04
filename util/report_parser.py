@@ -300,8 +300,8 @@ def load_into_db(report):
     """
     if is_loaded(report):
         return False
-
-    media_path = get_media_path()
+    # media path doesn't work here using URL when debug is off
+    media_path = settings.MEDIA_ROOT
     report_filename = os.path.basename(report.report_file.name)
     print "{}/{}".format(media_path, report.report_file.name)
 
