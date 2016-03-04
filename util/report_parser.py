@@ -256,7 +256,9 @@ def report_file_formatter(filename):
     :return checks_out: boolean, True - formatted and works, False - bad
     """
     # make a copy of the original
-    media_path = get_media_path()
+    # media_path = get_media_path()
+    # with debug mode off, going to wrong place
+    media_path = settings.MEDIA_ROOT
     report_file = open(os.path.join(media_path, filename), 'r')
     header_line_dict = get_header_cols_and_delim(report_file)
     delimiter = header_line_dict['delim']
