@@ -54,6 +54,8 @@ urlpatterns = patterns('',
                        url(r'^metadata/(?P<set_viewing_project_pk>\d+)/$', views.manage_metadata,
                            name='manage_metadata_set_viewing_project_pk'),
                        url(r'^metadata/new_metadata/$', views.new_metadata, name='new_metadata'),
+                       url(r'^metadata/edit_metadata/(?P<sample_id>\d+)/$',
+                           views.edit_metadata, name='edit_metadata'),
 
                        # Study
                        url(r'^study/$', views.manage_study, name='manage_study'),

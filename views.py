@@ -268,6 +268,79 @@ def new_metadata(request):
                                   context_instance=RequestContext(request))
 
 
+@permission_required('viewer.change_sample', login_url=reverse_lazy('viewer_restricted'))
+def edit_metadata(request, sample_id):
+    if request.method == 'POST':
+        sample = Sample.objects.get(pk=sample_id)
+
+        new_bids = [new_bid.strip() for new_bid in request.POST.get('metadata_bids').split(',')]
+        new_description = request.POST.get('metadata_description')
+        new_cellularity = request.POST.get('metadata_cellularity')
+
+        sample.description = new_description
+        sample.cellularity = new_cellularity
+        sample.save()
+
+
+        old_bids = [bid for bid in sample.bnid_set.all()]
+        for old_bid in old_bids:
+            old_bid.delete()
+
+        for new_bid in new_bids:
+            new_bid_object = Bnid()
+            new_bid_object.bnid = new_bid
+            new_bid_object.sample = sample
+            new_bid_object.save()
+
+
+        print new_bids
+        print new_description
+        print new_cellularity
+
+
+
+        # s = Study.objects.get(pk=study_id)
+        # updated_form = StudyForm(request.POST, instance=s)
+        # if updated_form.is_valid():
+        #     updated_form.save()
+        return HttpResponseRedirect(reverse('manage_metadata'))
+    else:
+        sample = Sample.objects.get(pk=sample_id)
+        bids = sample.bnid_set.all()
+
+
+        # study_obj = Study.objects.get(pk=study_id)
+        # sform = StudyForm(instance=study_obj)
+        # context = {'study_form': sform, 'name': study_obj.name, 'pk': study_obj.pk}
+        # context.update(csrf(request))
+        print sample.description
+        metadata_fields = [
+            {
+                'id': 'metadata_bids',
+                'label': 'Sample BIDs (comma separate for multiple):',
+                'value': ','.join([bid.bnid for bid in bids])
+            },
+            {
+                'id': 'metadata_description',
+                'label': 'Sample Description:',
+                'type': 'textarea',
+                'value': sample.description
+            },
+            {
+                'id': 'metadata_cellularity',
+                'label': 'Sample Percent Cellularity:',
+                'value': sample.cellularity
+            }
+        ]
+
+        context = {
+            'metadata_fields': metadata_fields,
+            'pk': sample_id,
+            'name': sample.name
+        }
+        context.update(csrf(request))
+        return render(request, 'viewer/metadata/edit_metadata.html', context)
+
 @permission_required('viewer.delete_sample', login_url=reverse_lazy('viewer_restricted'))
 def delete_sample(request, sample_id):
     if request.method == 'POST':

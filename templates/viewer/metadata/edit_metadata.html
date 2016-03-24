@@ -1,0 +1,40 @@
+<div class="container">
+	<h2>Edit Metadata: {{ name }}</h2>
+    <form enctype="multipart/form-data" method="post" action="{% url 'edit_metadata' pk %}">
+		{% csrf_token %}
+        {% for field in metadata_fields %}
+        <div class="row" style="margin-bottom:8px">
+            <div class="col-sm-2">
+                <label for="{{ field.id }}">{{ field.label }}</label>
+            </div>
+            <div class="col-sm-8">
+                {% if field.type == 'textarea' %}
+                <textarea class="form-control" cols="30" rows="6" id="{{ field.id }}" name="{{ field.id }}" style="resize:none" >
+                    {{ field.value }}
+                </textarea>
+                {% else %}
+                <input class="form-control" id="{{ field.id }}" name="{{ field.id }}" type="text" value="{{ field.value }}"/>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+{#        {% for field in project_form %}#}
+{#        <div class="row" style="margin-bottom:8px">#}
+{#            <div class="col-sm-2">#}
+{#                {{ field.label_tag }}#}
+{#            </div>#}
+{#            <div class="col-sm-6">#}
+{#                {{ field }}#}
+{#            </div>#}
+{#        </div>#}
+{#        {% endfor %}#}
+        <div class="row">
+            <div class="col-sm-6 col-sm-offset-2">
+                <button type="submit" class="btn btn-primary">
+                    <span class="fa fa-pencil-square-o"></span>&nbsp;&nbsp;Update
+                </button>
+            </div>
+        </div>
+	</form>
+	<br>
+</div>

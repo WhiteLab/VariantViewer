@@ -28,7 +28,7 @@ $(document).ready(function(){
     });
     new jBox('Modal', {
         onOpen: function(){
-            this.options.ajax.url = '/viewer/sample/edit_sample/' + pk;
+            this.options.ajax.url = '/viewer/metadata/edit_metadata/' + pk;
         },
         ajax: {
             reload: true
@@ -85,27 +85,13 @@ $(document).ready(function(){
             <td>{{s.creation_date}}</td>
             <td>
                 {% if perms.viewer.delete_sample %}
+                <span class="fa fa-2x fa-pencil igsbviewer-modal-edit-button" data-pk="{{s.pk}}"></span>&nbsp;&nbsp;
                 <span class="fa fa-2x fa-trash igsbviewer-modal-delete-button" data-pk="{{s.pk}}"></span>
                 {% endif %}
             </td>
         </tr>
         {% endfor %}
         </tbody>
-{#			<tbody>#}
-{#				{% for s in samples %}#}
-{#				<tr>#}
-{#					<td>{{s.study}}</td>#}
-{#					<td>{{s.name}}</td>#}
-{#					<td class="col-xs-4">{{s.description}}</td>#}
-{#					<td>{{s.cellularity}}</td>#}
-{#					<td>{{s.creation_date}}</td>#}
-{#                    <td>#}
-{#                        <span class="fa fa-2x fa-pencil-square-o igsbviewer-modal-edit-button" data-pk="{{s.pk}}"></span>&nbsp;&nbsp;#}
-{#                        <span class="fa fa-2x fa-trash igsbviewer-modal-delete-button" data-pk="{{s.pk}}"></span>#}
-{#                    </td>#}
-{#				</tr>#}
-{#				{% endfor %}#}
-{#			</tbody>#}
 	</table>
 </div>
 
