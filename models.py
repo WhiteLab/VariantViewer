@@ -159,4 +159,11 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     viewable_studies = models.ManyToManyField(Study)
 
-
+class Status(models.Model):
+    bnid = models.ForeignKey(Bnid)
+    study = models.ForeignKey(Study)
+    sample = models.ForeignKey(Sample)
+    sequence_date = models.DateField(verbose_name='Sequence Date', blank=True, null=True)
+    align_date = models.DateField(verbose_name='Align Date', blank=True, null=True)
+    analysis_date = models.DateField(verbose_name='Date Analyzed', blank=True, null=True)
+    status = models.CharField(max_length=256, verbose_name='Sample Status', default='Keys generated')
