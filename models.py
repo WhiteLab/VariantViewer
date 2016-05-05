@@ -159,6 +159,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     viewable_studies = models.ManyToManyField(Study)
 
+
 class Status(models.Model):
     bnid = models.ForeignKey(Bnid)
     study = models.ForeignKey(Study)
