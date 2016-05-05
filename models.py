@@ -168,3 +168,9 @@ class Status(models.Model):
     align_date = models.DateField(verbose_name='Align Date', blank=True, null=True)
     analysis_date = models.DateField(verbose_name='Date Analyzed', blank=True, null=True)
     status = models.CharField(max_length=256, verbose_name='Sample Status', default='Keys generated')
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = 'Statuses'

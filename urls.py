@@ -59,6 +59,7 @@ urlpatterns = patterns('',
 
                        # Status
                        url(r'^status/$', views.manage_status, name='manage_status'),
+                       url(r'^status/update_status/$', views.update_status, name='update_status'),
 
                        # Study
                        url(r'^study/$', views.manage_study, name='manage_study'),

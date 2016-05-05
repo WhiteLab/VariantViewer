@@ -372,25 +372,29 @@ def manage_status(request, set_viewing_project_pk=None):
 
 @permission_required('viewer.update_status', login_url=reverse_lazy('viewer_restricted'))
 def update_status(request):
+    from datetime import datetime
     update_req = simplejson.loads(request.readlines()[0])
-    bid = update_req['bid']
+    bid = update_req['bnid']
     bid_obj = Bnid.objects.get(bnid=bid)
-    sample_obj = Sample.objects.get(sample = bid_obj.sample)
+    sample_obj = Sample.objects.get(pk=bid_obj.sample_id)
     # method returns flag as to whether or not it had to create an object
-    (cur, cflag) = Status.objects.get_or_create(bnid=bid, sample=bid_obj.sample, study=sample_obj.study)
-    fname = {}
-    filt_name = {'bnid': 0, 'status': 0, 'study': 0}
-    for o in Status._meta.get_all_field_names():
-        if o not in filt_name and o[0] != '_':
-            fname[0] = 1
-    for k in update_req:
-        try:
-            if k in fname:
-               cur.objects.set(**{k:update_req[k]})
-        except Exception as e:
-            error = {'Message': e.message}
-            return HttpResponse(error)
     try:
+        (cur, cflag) = Status.objects.get_or_create(bnid=bid_obj, sample=sample_obj, study=sample_obj.study)
+
+        for k in update_req:
+            if k != 'bnid':
+                value = update_req[k]
+                if k[-4:] == 'date':
+                    value = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
+                print 'Updating object'
+                print value
+                setattr(cur, k, value)
+                print cur.status
+    except Exception as e:
+        error = {'Message': e.message}
+        return HttpResponse(error)
+    try:
+        print 'Saving new object'
         cur.save()
         json_response = cur.__dict__
         pretty = simplejson.dumps(json_response, sort_keys=True, indent=4)

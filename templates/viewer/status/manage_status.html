@@ -8,7 +8,7 @@
             <tr>
 				<th>Study</th>
 				<th>Sample</th>
-                <th>BIDs</th>
+                <th>BID</th>
 				<th>Sequence Date</th>
 				<th>Align Date</th>
 				<th>Analysis Date</th>
@@ -17,12 +17,12 @@
 			</tr>
 		</thead>
         <tbody>
-        {% for s in status %}
+        {% for s in statuses %}
         <tr>
-            <td>{{ s.study.name }}</td>
+            <td class="col-xs-2">{{ s.study.name }}</td>
             <td>{{ s.sample.name }}</td>
-            <td class="col-xs-2">{% for b in s.bnid_set.all %}{{ b.bnid }}<br/>{% endfor %}</td>
-            <td class="col-xs-4">{{s.sequence_date}}</td>
+            <td>{{ s.bnid.bnid }}</td>
+            <td>{{s.sequence_date}}</td>
             <td>{{s.align_date}}</td>
             <td>{{s.analysis_date}}</td>
             <td>{{s.status}}</td>
