@@ -386,10 +386,7 @@ def update_status(request):
                 value = update_req[k]
                 if k[-4:] == 'date':
                     value = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
-                print 'Updating object'
-                print value
                 setattr(cur, k, value)
-                print cur.status
     except Exception as e:
         error = {'Message': e.message}
         return HttpResponse(error)
