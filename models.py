@@ -164,6 +164,7 @@ class Status(models.Model):
     bnid = models.ForeignKey(Bnid)
     study = models.ForeignKey(Study)
     sample = models.ForeignKey(Sample)
+    submit_date = models.DateField(verbose_name='Submit for Sequence Date', blank=True, null=True)
     sequence_date = models.DateField(verbose_name='Sequence Date', blank=True, null=True)
     align_date = models.DateField(verbose_name='Align Date', blank=True, null=True)
     analysis_date = models.DateField(verbose_name='Date Analyzed', blank=True, null=True)

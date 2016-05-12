@@ -9,23 +9,24 @@
 				<th>Study</th>
 				<th>Sample</th>
                 <th>BID</th>
+                <th>Sequencing Submit Date</th>
 				<th>Sequence Date</th>
 				<th>Align Date</th>
 				<th>Analysis Date</th>
                 <th>Status</th>
-                <th>&nbsp;</th>
 			</tr>
 		</thead>
         <tbody>
         {% for s in statuses %}
         <tr>
-            <td class="col-xs-2">{{ s.study.name }}</td>
+            <td>{{ s.study.name }}</td>
             <td>{{ s.sample.name }}</td>
             <td>{{ s.bnid.bnid }}</td>
-            <td>{{s.sequence_date}}</td>
-            <td>{{s.align_date}}</td>
-            <td>{{s.analysis_date}}</td>
-            <td>{{s.status}}</td>
+            <td>{{ s.submit_date }}</td>
+            <td>{{ s.sequence_date }}</td>
+            <td>{{ s.align_date }}</td>
+            <td>{{ s.analysis_date }}</td>
+            <td>{{ s.status }}</td>
         </tr>
         {% endfor %}
         </tbody>
