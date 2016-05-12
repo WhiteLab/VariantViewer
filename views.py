@@ -387,8 +387,8 @@ def update_status(request):
                 if k[-4:] == 'date':
                     value = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
                 setattr(cur, k, value)
-    except Exception as e:
-        error = {'Message': e.message}
+    except:
+        error = 'No metadata for bid ' + bid
         return HttpResponse(error)
     try:
         print 'Saving new object'
