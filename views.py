@@ -401,7 +401,7 @@ def update_status(request):
         return HttpResponse(error)
 
 
-@permission_required('viewer.update_status', login_url=reverse_lazy('viewer_restricted'))
+@permission_required('viewer.check_status', login_url=reverse_lazy('viewer_restricted'))
 def check_status(request):
     check_req = simplejson.loads(request.readlines()[0])
     bid = check_req['bnid']
