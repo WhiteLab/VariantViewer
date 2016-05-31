@@ -41,7 +41,8 @@ urlpatterns = patterns('',
                        # Bnid
                        url(r'^get_bnids_by_study/(?P<study_id>\d+)/$',
                            views.get_bnids_by_study, name='get_bnids_by_study'),
-
+                       url(r'^get_studies/$',
+                           views.get_studies, name='get_studies'),
 
                        # Sample
                        url(r'delete_sample/(?P<sample_id>\d+)/$', views.delete_sample,

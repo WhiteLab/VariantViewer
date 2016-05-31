@@ -846,6 +846,12 @@ def get_bnids_by_study(request, study_id=None):
     return HttpResponse(simplejson.dumps(bnid_dict),
                         content_type="application/json")
 
+@login_required
+def get_studies(request):
+    study = Study.objects.get()
+    return HttpResponse(simplejson.dumps(study.__dict__),
+                        content_type="application/json")
+
 
 @login_required
 def load_variants(request, report_id=None):
