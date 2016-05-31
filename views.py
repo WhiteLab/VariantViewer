@@ -400,6 +400,16 @@ def update_status(request):
         error = {'Message': e.message}
         return HttpResponse(error)
 
+
+@permission_required('viewer.update_status', login_url=reverse_lazy('viewer_restricted'))
+def check_status(request):
+    check_req = simplejson.loads(request.readlines()[0])
+    bid = check_req['bnid']
+    bid_obj = Bnid.objects.get(bnid=bid)
+    cur = Status.objects.get(bnid=bid_obj.pk)
+    return simplejson.dumps(cur.__dict__, content_type="application/json")
+
+
 '''
 Report model
 '''
