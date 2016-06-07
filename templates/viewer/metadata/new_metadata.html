@@ -24,7 +24,7 @@
             colHeaders: ['Study', 'Sample', 'BID', 'Description', 'Percent Cellularity']
         });
         $('#new-metadata-btn').click(function(){
-            var sheet_data_json = JSON.stringify(sheet_data)
+            var sheet_data_json = JSON.stringify(sheet_data);
             $('#new-metadata-data').val(sheet_data_json);
             $('form').submit();
         });

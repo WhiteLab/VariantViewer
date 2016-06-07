@@ -236,12 +236,19 @@ def manage_metadata(request, set_viewing_project_pk=None):
 @permission_required('viewer.add_sample', login_url=reverse_lazy('viewer_restricted'))
 def new_metadata(request):
     if request.method == 'POST':
-        sheet_data = simplejson.loads(request.POST.get('sheet'))
+        try:
+            sheet_data = simplejson.loads(request.POST.get('sheet'))
+            print 'Found sheet data in post'
+        except:
+            input_data = simplejson.loads(request.readlines()[0])
+            sheet_data = input_data['sheet']
         for row in sheet_data:
             (study_name, sample_name,
              bid, description, cellularity) = row
+            print 'Creating entry for ' + bid
             if not Study.objects.filter(name=study_name).exists():
                 # Notify user
+                print 'Did not find study info'
                 continue
             if not Sample.objects.filter(name=sample_name).exists():
                 new_sample = Sample()
@@ -253,6 +260,7 @@ def new_metadata(request):
             if not Bnid.objects.filter(bnid=bid).exists():
                 new_bnid = Bnid()
                 new_bnid.bnid = bid
+                new_bnid.description = description
                 new_bnid.sample = Sample.objects.get(name=sample_name)
                 new_bnid.save()
         return HttpResponseRedirect(reverse('manage_metadata'))
@@ -289,15 +297,13 @@ def edit_metadata(request, sample_id):
         for new_bid in new_bids:
             new_bid_object = Bnid()
             new_bid_object.bnid = new_bid
+            new_bid_object.description = new_description
             new_bid_object.sample = sample
             new_bid_object.save()
-
 
         print new_bids
         print new_description
         print new_cellularity
-
-
 
         # s = Study.objects.get(pk=study_id)
         # updated_form = StudyForm(request.POST, instance=s)
@@ -307,7 +313,6 @@ def edit_metadata(request, sample_id):
     else:
         sample = Sample.objects.get(pk=sample_id)
         bids = sample.bnid_set.all()
-
 
         # study_obj = Study.objects.get(pk=study_id)
         # sform = StudyForm(instance=study_obj)
@@ -341,6 +346,7 @@ def edit_metadata(request, sample_id):
         context.update(csrf(request))
         return render(request, 'viewer/metadata/edit_metadata.html', context)
 
+
 @permission_required('viewer.delete_sample', login_url=reverse_lazy('viewer_restricted'))
 def delete_sample(request, sample_id):
     if request.method == 'POST':
@@ -369,6 +375,7 @@ def manage_status(request, set_viewing_project_pk=None):
         'statuses': Status.objects.filter(study__project__pk=project_pk).filter(study__in=viewable_studies),
     }
     return render(request, 'viewer/status/manage_status.html', context)
+
 
 @permission_required('viewer.update_status', login_url=reverse_lazy('viewer_restricted'))
 def update_status(request):
@@ -846,12 +853,20 @@ def get_bnids_by_study(request, study_id=None):
     return HttpResponse(simplejson.dumps(bnid_dict),
                         content_type="application/json")
 
+
 @login_required
 def get_studies(request):
-    study = Study.objects.get()
-    return HttpResponse(simplejson.dumps(study.__dict__),
-                        content_type="application/json")
-
+    try:
+        study_dict = {}
+        studies = Study.objects.all()
+        for study in studies:
+            study_dict[study.name] = study.id
+        print 'get study command ok'
+        return HttpResponse(simplejson.dumps(study_dict))
+    except Exception as e:
+        error = {'Message': e.message}
+        print e.message
+        return HttpResponse(simplejson.dumps(error))
 
 @login_required
 def load_variants(request, report_id=None):

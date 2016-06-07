@@ -171,7 +171,7 @@ class Status(models.Model):
     status = models.CharField(max_length=256, verbose_name='Sample Status', default='Keys generated')
 
     def __str__(self):
-        return self.name
+        return str(self.bnid)
 
     class Meta:
         verbose_name_plural = 'Statuses'

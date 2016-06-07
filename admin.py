@@ -32,6 +32,11 @@ class StudyAdmin(admin.ModelAdmin):
     list_display = ('name', 'description')
 
 
+class StatusAdmin(admin.ModelAdmin):
+    model = Status
+    list_display = 'bnid'
+
+
 class GenomeAdmin(admin.ModelAdmin):
     model = Genome
     list_display = ('id', 'name')

@@ -80,7 +80,7 @@ $(document).ready(function(){
             <td>{{ s.study.name }}</td>
             <td>{{ s.name }}</td>
             <td class="col-xs-2">{% for b in s.bnid_set.all %}{{ b.bnid }}<br/>{% endfor %}</td>
-            <td class="col-xs-4">{{s.description}}</td>
+            <td class="col-xs-4">{% for b in s.bnid_set.all %}{{b.description}}<br/>{% endfor %}</td>
             <td>{{s.cellularity}}</td>
             <td>{{s.creation_date}}</td>
             <td>
