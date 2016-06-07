@@ -11,11 +11,11 @@ class ProjectAdmin(admin.ModelAdmin):
 
 class BnidAdmin(admin.ModelAdmin):
     model = Bnid
-
+    list_display = ('__str__', 'description', 'creation_date')
 
 class SampleAdmin(admin.ModelAdmin):
     model = Sample
-    list_display =('id', 'name')
+    list_display =('id', 'name', 'creation_date')
 
 
 class CallerAdmin(admin.ModelAdmin):
