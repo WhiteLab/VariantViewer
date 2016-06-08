@@ -423,7 +423,6 @@ def get_all_statuses(request):
     statuses = {}
     for s in cur:
         statuses[s.bnid.bnid] = s.status
-        print s.bnid.bnid + " " + s.status
     # statuses = simplejson.dumps(cur.__dict__)
     pretty = simplejson.dumps(statuses, sort_keys=True, indent=4)
     return HttpResponse(pretty)
