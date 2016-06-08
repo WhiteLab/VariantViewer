@@ -13,6 +13,7 @@ class BnidAdmin(admin.ModelAdmin):
     model = Bnid
     list_display = ('__str__', 'description', 'creation_date')
 
+
 class SampleAdmin(admin.ModelAdmin):
     model = Sample
     list_display =('id', 'name', 'creation_date')
@@ -34,7 +35,7 @@ class StudyAdmin(admin.ModelAdmin):
 
 class StatusAdmin(admin.ModelAdmin):
     model = Status
-    list_display = 'bnid'
+    list_display = ('bnid', 'status')
 
 
 class GenomeAdmin(admin.ModelAdmin):
@@ -58,9 +59,11 @@ class SharedDataAdmin(admin.ModelAdmin):
     model = SharedData
     list_display = ('uuid', 'field_lookup', 'user', 'creation_date', 'inactive_date')
 
+
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
     can_delete = False
+
 
 class UserAdmin(BaseUserAdmin):
     inlines = (UserProfileInline,)
@@ -68,6 +71,7 @@ class UserAdmin(BaseUserAdmin):
 admin.site.register(Project, ProjectAdmin)
 admin.site.register(Sample, SampleAdmin)
 admin.site.register(Bnid, BnidAdmin)
+admin.site.register(Status, StatusAdmin)
 admin.site.register(Study, StudyAdmin)
 admin.site.register(Caller, CallerAdmin)
 admin.site.register(Report, ReportAdmin)

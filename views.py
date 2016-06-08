@@ -417,6 +417,18 @@ def check_status(request):
     return simplejson.dumps(cur.__dict__, content_type="application/json")
 
 
+@permission_required('viewer.get_all_statuses', login_url=reverse_lazy('viewer_restricted'))
+def get_all_statuses(request):
+    cur = Status.objects.all()
+    statuses = {}
+    for s in cur:
+        statuses[s.bnid.bnid] = s.status
+        print s.bnid.bnid + " " + s.status
+    # statuses = simplejson.dumps(cur.__dict__)
+    pretty = simplejson.dumps(statuses, sort_keys=True, indent=4)
+    return HttpResponse(pretty)
+
+
 '''
 Report model
 '''
