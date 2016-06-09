@@ -413,8 +413,11 @@ def check_status(request):
     check_req = simplejson.loads(request.readlines()[0])
     bid = check_req['bnid']
     bid_obj = Bnid.objects.get(bnid=bid)
-    cur = Status.objects.get(bnid=bid_obj.pk)
-    return simplejson.dumps(cur.__dict__, content_type="application/json")
+    try:
+        cur = Status.objects.get(bnid=bid_obj.pk)
+        return simplejson.dumps(cur.__dict__, content_type="application/json")
+    except:
+        return HttpResponse('None')
 
 
 @permission_required('viewer.get_all_statuses', login_url=reverse_lazy('viewer_restricted'))
