@@ -12,19 +12,20 @@ variant_headers = {'chr': 'str',
                    'pos': 'int',
                    'ref': 'str',
                    'alt': 'str',
+                   'gene': 'str',
                    'normal_ref_count': 'int',
                    'normal_alt_count': 'int',
                    'pct_normal_alt': 'float',
                    'tumor_ref_count': 'int',
                    'tumor_alt_count': 'int',
                    'pct_tumor_alt': 'float',
-                   'tn_pct_alt_ratio': 'float',
-                   'gene': 'str'}
+                   'tn_pct_alt_ratio': 'float'
+                   }
 
-ordered_headers = ['chr', 'pos', 'ref', 'alt', 'normal_ref_count',
+ordered_headers = ['chr', 'pos', 'gene', 'ref', 'alt', 'normal_ref_count',
                    'normal_alt_count', 'pct_normal_alt', 'tumor_ref_count',
-                   'tumor_alt_count', 'pct_tumor_alt', 'tn_pct_alt_ratio',
-                   'gene']
+                   'tumor_alt_count', 'pct_tumor_alt', 'tn_pct_alt_ratio'
+                   ]
 
 
 def get_media_path():
@@ -110,13 +111,18 @@ def add_goodies(atoms, headers, md_anderson_genes, eMERGE_genelist):
 
             # construct additional links out
             gene_str_extension = '<br/><span style=\"font-size:x-small\">'
+            try:
+                if atoms[i].lower() in md_anderson_genes:
+                    gene_str_extension += '<a href=\"{link}\" target=\"_blank\" title=\"MDAnderson Cancer Center\">MDAnderson</a>'.format(
+                            link=md_anderson_genes[atoms[i].lower()])
+            except AttributeError:
+                pass
 
-            if atoms[i].lower() in md_anderson_genes:
-                gene_str_extension += '<a href=\"{link}\" target=\"_blank\" title=\"MDAnderson Cancer Center\">MDAnderson</a>'.format(
-                        link=md_anderson_genes[atoms[i].lower()])
-
-            if atoms[i].upper() in eMERGE_genelist:
-                gene_str_extension += ' eMERGE'
+            try:
+                if atoms[i].upper() in eMERGE_genelist:
+                    gene_str_extension += ' eMERGE'
+            except AttributeError:
+                pass
 
             # assemble additional links
             new_link = '{gene_card}{ext}</span>'.format(gene_card=gene_card,
@@ -201,12 +207,12 @@ def json_from_ajax(db_response):
     # Temporary to make search and view report agree on the header for the gene name
     # TODO
     headers[headers.index('gene_name')] = 'gene'
-
     # Parse list of variant records
     variant_records = []
     for variant in db_response:
-        # Get all field names, delete report object
-        field_names = Variant._meta.get_all_field_names()
+        # Get all field names, delete report object.  Added sorting here for compatibility with new django
+        field_names = sorted(Variant._meta.get_all_field_names())
+        print field_names
         del field_names[field_names.index('report')]
 
         # Pull relevent fields from variant object
