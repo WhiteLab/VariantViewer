@@ -113,8 +113,8 @@ def add_goodies(atoms, headers, md_anderson_genes, eMERGE_genelist):
             gene_str_extension = '<br/><span style=\"font-size:x-small\">'
             try:
                 if atoms[i].lower() in md_anderson_genes:
-                    gene_str_extension += '<a href=\"{link}\" target=\"_blank\" title=\"MDAnderson Cancer Center\">MDAnderson</a>'.format(
-                            link=md_anderson_genes[atoms[i].lower()])
+                    gene_str_extension += '<a href=\"{link}\" target=\"_blank\" title=\"MDAnderson Cancer Center\">' \
+                                          'MDAnderson</a>'.format(link=md_anderson_genes[atoms[i].lower()])
             except AttributeError:
                 pass
 
