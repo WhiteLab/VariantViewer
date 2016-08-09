@@ -243,8 +243,9 @@ def new_metadata(request):
             input_data = simplejson.loads(request.readlines()[0])
             sheet_data = input_data['sheet']
         for row in sheet_data:
-            (study_name, sample_name,
-             bid, description, cellularity) = row
+            print row
+            (study_name, sample_name, bid, library_type, description, cellularity) = row
+
             print 'Creating entry for ' + bid
             if not Study.objects.filter(name=study_name).exists():
                 # Notify user
@@ -261,6 +262,7 @@ def new_metadata(request):
                 new_bnid = Bnid()
                 new_bnid.bnid = bid
                 new_bnid.description = description
+                new_bnid.library_type = library_type
                 new_bnid.sample = Sample.objects.get(name=sample_name)
                 new_bnid.save()
         return HttpResponseRedirect(reverse('manage_metadata'))

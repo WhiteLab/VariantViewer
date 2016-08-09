@@ -68,6 +68,7 @@ class Bnid(models.Model):
     bnid = models.CharField(max_length=12, verbose_name='Bionimbus ID')
     description = models.CharField(max_length=256, verbose_name='Description',
                                    blank=True)
+    library_type = models.CharField(max_length=32, verbose_name='Sequencing library type', blank=True)
     creation_date = models.DateTimeField('Date Created', auto_now=True,
                                          blank=True)
 

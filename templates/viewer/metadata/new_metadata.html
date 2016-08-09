@@ -1,5 +1,5 @@
 <div class="container">
-	<h2>Create a New Metadatas | {{ project_name }}</h2>
+	<h2>Bulk Create New Metadata | {{ project_name }}</h2>
     <form action="{% url 'new_metadata' %}" method="post">
         {% csrf_token %}
         <div id="new-metadata-sheet"></div><br/>
@@ -11,17 +11,17 @@
 <script>
     $(document).ready(function(){
         sheet_data = [
-            ['', '', '', '', ''],
-            ['', '', '', '', ''],
-            ['', '', '', '', ''],
-            ['', '', '', '', ''],
-            ['', '', '', '', ''],
-            ['', '', '', '', '']
+            ['', '', '', '', '', ''],
+            ['', '', '', '', '', ''],
+            ['', '', '', '', '', ''],
+            ['', '', '', '', '', ''],
+            ['', '', '', '', '', ''],
+            ['', '', '', '', '', '']
         ];
         var ht = new Handsontable($('#new-metadata-sheet')[0], {
             data: sheet_data,
             rowHeaders: true,
-            colHeaders: ['Study', 'Sample', 'BID', 'Description', 'Percent Cellularity']
+            colHeaders: ['Study', 'Sample', 'BID', 'Library type', 'Description', 'Percent Cellularity']
         });
         $('#new-metadata-btn').click(function(){
             var sheet_data_json = JSON.stringify(sheet_data);

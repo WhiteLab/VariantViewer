@@ -55,7 +55,7 @@ $(document).ready(function(){
 {% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container-fluid" style="margin-left: 50px; margin-right: 50px">
     <h2>{{ project_name }} | Available Metadata:</h2>
     {% if perms.viewer.add_sample %}
     <button type="button" class="btn btn-primary btn-sm igsbviewer-modal-add-button">
@@ -68,6 +68,7 @@ $(document).ready(function(){
 				<th>Study</th>
 				<th>Sample</th>
                 <th>BIDs</th>
+                <th>Library Type</th>
 				<th>Description</th>
 				<th>% Cellularity</th>
 				<th>Creation Date</th>
@@ -78,9 +79,10 @@ $(document).ready(function(){
         {% for s in samples %}
         <tr>
             <td>{{ s.study.name }}</td>
-            <td>{{ s.name }}</td>
+            <td class="col-xs-2">{{ s.name }}</td>
             <td class="col-xs-2">{% for b in s.bnid_set.all %}{{ b.bnid }}<br/>{% endfor %}</td>
-            <td class="col-xs-4">{% for b in s.bnid_set.all %}{{b.description}}<br/>{% endfor %}</td>
+            <td>{% for b in s.bnid_set.all %}{{ b.library_type }}<br/>{% endfor %}</td>
+            <td class="col-xs-3">{% for b in s.bnid_set.all %}{{b.description}}<br/>{% endfor %}</td>
             <td>{{s.cellularity}}</td>
             <td>{{s.creation_date}}</td>
             <td>
