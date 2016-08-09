@@ -243,7 +243,6 @@ def new_metadata(request):
             input_data = simplejson.loads(request.readlines()[0])
             sheet_data = input_data['sheet']
         for row in sheet_data:
-            print row
             (study_name, sample_name, bid, library_type, description, cellularity) = row
 
             print 'Creating entry for ' + bid
