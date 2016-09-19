@@ -243,6 +243,7 @@ def new_metadata(request):
             input_data = simplejson.loads(request.readlines()[0])
             sheet_data = input_data['sheet']
         for row in sheet_data:
+            row = [r.strip() for r in row]
             (study_name, sample_name, bid, library_type, description, cellularity) = row
 
             print 'Creating entry for ' + bid
@@ -288,20 +289,37 @@ def edit_metadata(request, sample_id):
         new_cellularity = request.POST.get('metadata_cellularity')
 
         sample.name = new_name
-        sample.description = new_description
+        sample.description = new_description.strip()
         sample.cellularity = new_cellularity
         sample.save()
 
-        old_bids = [bid for bid in sample.bnid_set.all()]
-        for old_bid in old_bids:
-            old_bid.delete()
+        old_bids = {bid.bnid for bid in sample.bnid_set.all()}
 
-        for new_bid in new_bids:
-            new_bid_object = Bnid()
-            new_bid_object.bnid = new_bid
-            new_bid_object.description = new_description
-            new_bid_object.sample = sample
-            new_bid_object.save()
+        # Create BIDs that don't already exist
+        for bid in new_bids:
+            if bid not in old_bids:
+                new_bid_object = Bnid()
+                new_bid_object.bnid = bid
+                new_bid_object.description = new_description
+                new_bid_object.sample = sample
+                new_bid_object.save()
+
+        # Delete orphaned BIDs
+        for bid in old_bids:
+            if bid not in new_bids:
+                sample.bnid_set.get(bnid=bid).delete()
+
+
+
+        # for old_bid in old_bids:
+        #     old_bid.delete()
+        #
+        # for new_bid in new_bids:
+        #     new_bid_object = Bnid()
+        #     new_bid_object.bnid = new_bid
+        #     new_bid_object.description = new_description
+        #     new_bid_object.sample = sample
+        #     new_bid_object.save()
 
         print new_bids
         print new_description
