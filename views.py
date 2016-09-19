@@ -283,13 +283,14 @@ def edit_metadata(request, sample_id):
         sample = Sample.objects.get(pk=sample_id)
 
         new_bids = [new_bid.strip() for new_bid in request.POST.get('metadata_bids').split(',')]
+        new_name = request.POST.get('metadata_name')
         new_description = request.POST.get('metadata_description')
         new_cellularity = request.POST.get('metadata_cellularity')
 
+        sample.name = new_name
         sample.description = new_description
         sample.cellularity = new_cellularity
         sample.save()
-
 
         old_bids = [bid for bid in sample.bnid_set.all()]
         for old_bid in old_bids:
@@ -325,6 +326,11 @@ def edit_metadata(request, sample_id):
                 'id': 'metadata_bids',
                 'label': 'Sample BIDs (comma separate for multiple):',
                 'value': ','.join([bid.bnid for bid in bids])
+            },
+            {
+                'id': 'metadata_name',
+                'label': 'Sample Name:',
+                'value': sample.name
             },
             {
                 'id': 'metadata_description',
