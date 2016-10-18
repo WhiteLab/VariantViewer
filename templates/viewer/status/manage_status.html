@@ -1,38 +1,124 @@
 {% extends "viewer/base.html" %}
 {% load staticfiles %}
 {% block content %}
-<div class="container-fluid" style="margin-left: 50px; margin-right: 50px;">
+<div id="statuses" class="container-fluid" style="margin-left: 50px; margin-right: 50px;">
+    <div class="row">
+        <div class="col-sm-10">
+            <input class="search form-control" placeholder="Search..."/>
+        </div>
+        <div class="col-sm-2">
+            <button id="tsv-download-btn" class="btn btn-primary" style="float:right">
+                <span class="fa fa-th-list"></span>&nbsp;&nbsp;Create TSV
+            </button>
+        </div>
+    </div>
     <h2>{{ project_name }} | Sample Statuses (BETA, MOSTLY ACCURATE):</h2>
-	<table class="table table-hover">
+	<table id="status-table" class="table table-hover">
 		<thead>
             <tr>
-				<th>Study</th>
-				<th class="col-xs-2">Sample</th>
-                <th>BID</th>
-                <th>Library Type</th>
-                <th>Sequencing Submit Date</th>
-				<th>Sequence Date</th>
-				<th>Align Date</th>
-				<th>Analysis Date</th>
-                <th>Status</th>
+				<th class="sort listjs-sort-header" data-sort="study-name">Study</th>
+				<th class="col-xs-2 sort listjs-sort-header" data-sort="sample-name">Sample</th>
+                <th class="sort listjs-sort-header" data-sort="bnid">BID</th>
+                <th class="sort listjs-sort-header" data-sort="bnid-library-type">Library Type</th>
+                <th class="sort listjs-sort-header" data-sort="submit-date">Sequencing Submit Date</th>
+				<th class="sort listjs-sort-header" data-sort="sequence-date">Sequence Date</th>
+				<th class="sort listjs-sort-header" data-sort="align-date">Align Date</th>
+				<th class="sort listjs-sort-header" data-sort="analysis-date">Analysis Date</th>
+                <th class="sort listjs-sort-header" data-sort="status">Status</th>
 			</tr>
 		</thead>
-        <tbody>
+        <tbody class="list">
         {% for s in statuses %}
         <tr>
-            <td>{{ s.study.name }}</td>
-            <td>{{ s.sample.name }}</td>
-            <td>{{ s.bnid.bnid }}</td>
-            <td>{{ s.bnid.library_type}}</td>
-            <td>{{ s.submit_date }}</td>
-            <td>{{ s.sequence_date }}</td>
-            <td>{{ s.align_date }}</td>
-            <td>{{ s.analysis_date }}</td>
-            <td>{{ s.status }}</td>
+            <td class="study-name">{{ s.study.name }}</td>
+            <td class="sample-name">{{ s.sample.name }}</td>
+            <td class="bnid">{{ s.bnid.bnid }}</td>
+            <td class="bnid-library-type">{{ s.bnid.library_type}}</td>
+            <td class="submit-date">{{ s.submit_date }}</td>
+            <td class="sequence-date">{{ s.sequence_date }}</td>
+            <td class="align-date">{{ s.align_date }}</td>
+            <td class="analysis-date">{{ s.analysis_date }}</td>
+            <td class="status">{{ s.status }}</td>
         </tr>
         {% endfor %}
         </tbody>
 	</table>
 </div>
+    <script src="http://listjs.com/no-cdn/list.js"></script>
+    <script src="{% static 'js/lib/FileSaver.min.js' %}"></script>
+    <script>
+        var statusFields = [
+                'study-name',
+                'sample-name',
+                'bnid',
+                'bnid-library-type',
+                'submit-date',
+                'sequence-date',
+                'align-date',
+                'analysis-date',
+                'status'
+        ];
+        var statusList = new List('statuses', {valueNames: statusFields});
+
+    var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    $('#tsv-download-btn').click(function() {
+        var date = new Date();
+        var filename = date.getFullYear() + monthNames[date.getMonth()] + date.getDate() + '_statuses.xls';
+        var tsv = [];
+        var statusTable = $('#status-table');
+        var headers = [];
+        statusTable.children('thead').find('th').each(function() {
+            headers.push($(this).text());
+        });
+        tsv.push(headers);
+        statusTable.children('tbody').find('tr').each(function() {
+            var record = [];
+            $(this).children('td').each(function() {
+                record.push($(this).text())
+            });
+            tsv.push(record);
+        });
+
+        var finaltsv = '';
+        for (var i = 0, len = tsv.length; i < len; i++) {
+            finaltsv += tsv[i].join('\t') + '\n';
+        }
+        saveAs(new Blob([finaltsv], {type: "text/plain;charset=utf-8"}), filename);
+    });
+
+
+    </script>
+    <style>
+    .listjs-sort-header {
+        cursor: pointer;
+        -webkit-touch-callout: none; /* iOS Safari */
+        -webkit-user-select: none;   /* Chrome/Safari/Opera */
+        -moz-user-select: none;      /* Firefox */
+        -ms-user-select: none;       /* Internet Explorer/Edge */
+        user-select: none;
+    }
+    .listjs-sort-header.asc::after {
+        display: inline-block;
+        content: "";
+        width: 0;
+        height: 0;
+        margin-left: 2px;
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-top: 8px solid #2c3e50;
+    }
+    .listjs-sort-header.desc::after {
+        display: inline-block;
+        content: "";
+        width: 0;
+        height: 0;
+        margin-left: 2px;
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-bottom: 8px solid #2c3e50;
+    }
+    </style>
 
 {% endblock %}
