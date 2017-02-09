@@ -25,7 +25,9 @@
             <td>{{ s.bnid.bnid }}</td>
             <td>{{ s.bnid.library_type}}</td>
             <td>{{ s.submit_date }}</td>
-            <td>{{ s.sequence_date }}</td>
+            <td>{%if s.status != 'Sample submitted for sequencing' and s.status != 'SEQUENCED'%}<a
+                    href="/~mbrown/ALIGN/{{s.bnid.bnid}}/QC/" >{{ s.sequence_date }}</a>{% else %}{{ s.sequence_date }}
+                {%endif%}</td>
             <td>{{ s.align_date }}</td>
             <td>{{ s.analysis_date }}</td>
             <td>{{ s.status }}</td>
