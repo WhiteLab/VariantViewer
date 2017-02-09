@@ -2,8 +2,10 @@
 {% load staticfiles %}
 
 {% block extra_js %}
+<script src="{% static 'js/report/view_report.js' %}"></script>
 <script>
     $(document).ready(function() {
+
 {#        $('#report-table').dynatable();#}
 {#        $.fn.dataTable.Api.register( 'column().title()', function () {#}
 {#            var colheader = this.header();#}
@@ -40,6 +42,8 @@
 
 
 
+
+
     });
 </script>
 
@@ -56,50 +60,69 @@
         background-color: #c2d2cf;
     }
 </style>
-<div class="container">
-    <div class="row">
-        {% if viewing_report %}
-        <table style="width: 250px" class="table table-bordered">
-            <thead>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="b">Report</td>
-                    <td colspan="2" nowrap>{{filename}}</td>
-                </tr>
-                <tr>
-                    <td class="b">Study</td>
-                    <td colspan="2">{{study}}</td>
-                </tr>
-                <tr>
-                    <td class="b">BionimbusIDs</td>
-                    {% for b in report_obj.bnids.all %}
-                    <td>{{b}}</td>
-                    {% endfor %}
-                </tr>
-            </tbody>
-        </table>
-        {% else %}
-            <h2>{{ shared_data_name }}</h2>
-        {% endif %}
-    </div>
-    <div class="row" style="margin-bottom:50px">
-        <small>
-            Note: columns are sortable, movable, and removable. <br>
-            'INTRON' and 'INTERGENIC' variants have been removed.
-        </small>
-        <div style="height:350px;overflow:scroll" class="scrollable-area">
-            <style>
-                th {
-                    background-color:rgba(255,255,255,1);
-                    text-align: center;
-                }
-                td {
-                    text-align: center;
-                }
-            </style>
+<div class="container-fluid igsbviewer-full-height">
+    <div class="row igsbviewer-full-height">
+        <div class="col-lg-8 igsbviewer-full-height igsbviewer-flex-container">
+            <div class="row igsbviewer-flex-content">
+                <div class="col-lg-12">
+                    <span>View Table:</span><br/>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary">Full</button>
+                        <button type="button" class="btn btn-primary">Condensed</button>
+                    </div>
+                    <div style="float:right">
+                        {% if viewing_report %}
+                        <table style="width: 250px" class="table table-bordered">
+                            <thead>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="b">Report</td>
+                                    <td colspan="2" nowrap>{{filename}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="b">Study</td>
+                                    <td colspan="2">{{study}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="b">BionimbusIDs</td>
+                                    {% for b in report_obj.bnids.all %}
+                                    <td>{{b}}</td>
+                                    {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                        {% else %}
+                            <h2>{{ shared_data_name }}</h2>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="row igsbviewer-flex-container igsbviewer-flex-content" style="padding-bottom:25px">
+                <div class="col-lg-12 igsbviewer-flex-container igsbviewer-flex-content">
+{#                    <small>#}
+{#                        Note: columns are sortable, movable, and removable. <br>#}
+{#                        'INTRON' and 'INTERGENIC' variants have been removed.#}
+{#                    </small>#}
+                    <div style="overflow:scroll" class="igsbviewer-flex-content igsbviewer-skinny-scroll">
+                        <style>
+                            th {
+                                background-color:rgba(255,255,255,1);
+                                text-align: center;
+                            }
+                            td {
+                                text-align: center;
+                            }
+                        </style>
 
-            {{report_html|safe}}
+                        {{report_html|safe}}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-lg-4 viewer-side igsbviewer-skinny-scroll" id="igsbviewer-right-panel">
+            <h3>Click on a variant to view.</h3>
         </div>
     </div>
 </div>

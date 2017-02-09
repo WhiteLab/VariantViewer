@@ -91,6 +91,8 @@ urlpatterns = patterns('',
                            name='load_variants'),
                        url(r'^report/zip-and-download/', views.zip_and_download, name='zip_and_download'),
                        url(r'^report/get_info/$', views.report_info_get, name='report_info_get'),
+                       url(r'^report/get_right_sidebar/$', views.view_report_right_sidebar,
+                           name='view_report_right_sidebar'),
 
                        # Share
                        url(r'^shared/view/(?P<shared_data_uuid>[\da-f\-]+)/$', views.view_shared_data,

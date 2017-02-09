@@ -1,4 +1,5 @@
 import simplejson
+import re
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import permission_required, login_required
@@ -243,6 +244,7 @@ def new_metadata(request):
             input_data = simplejson.loads(request.readlines()[0])
             sheet_data = input_data['sheet']
         for row in sheet_data:
+            row = [r.strip() for r in row]
             (study_name, sample_name, bid, library_type, description, cellularity) = row
 
             print 'Creating entry for ' + bid
@@ -283,24 +285,42 @@ def edit_metadata(request, sample_id):
         sample = Sample.objects.get(pk=sample_id)
 
         new_bids = [new_bid.strip() for new_bid in request.POST.get('metadata_bids').split(',')]
+        new_name = request.POST.get('metadata_name')
         new_description = request.POST.get('metadata_description')
         new_cellularity = request.POST.get('metadata_cellularity')
 
-        sample.description = new_description
+        sample.name = new_name
+        sample.description = new_description.strip()
         sample.cellularity = new_cellularity
         sample.save()
 
+        old_bids = {bid.bnid for bid in sample.bnid_set.all()}
 
-        old_bids = [bid for bid in sample.bnid_set.all()]
-        for old_bid in old_bids:
-            old_bid.delete()
+        # Create BIDs that don't already exist
+        for bid in new_bids:
+            if bid not in old_bids:
+                new_bid_object = Bnid()
+                new_bid_object.bnid = bid
+                new_bid_object.description = new_description
+                new_bid_object.sample = sample
+                new_bid_object.save()
 
-        for new_bid in new_bids:
-            new_bid_object = Bnid()
-            new_bid_object.bnid = new_bid
-            new_bid_object.description = new_description
-            new_bid_object.sample = sample
-            new_bid_object.save()
+        # Delete orphaned BIDs
+        for bid in old_bids:
+            if bid not in new_bids:
+                sample.bnid_set.get(bnid=bid).delete()
+
+
+
+        # for old_bid in old_bids:
+        #     old_bid.delete()
+        #
+        # for new_bid in new_bids:
+        #     new_bid_object = Bnid()
+        #     new_bid_object.bnid = new_bid
+        #     new_bid_object.description = new_description
+        #     new_bid_object.sample = sample
+        #     new_bid_object.save()
 
         print new_bids
         print new_description
@@ -325,6 +345,11 @@ def edit_metadata(request, sample_id):
                 'id': 'metadata_bids',
                 'label': 'Sample BIDs (comma separate for multiple):',
                 'value': ','.join([bid.bnid for bid in bids])
+            },
+            {
+                'id': 'metadata_name',
+                'label': 'Sample Name:',
+                'value': sample.name
             },
             {
                 'id': 'metadata_description',
@@ -537,6 +562,27 @@ def view_report(request, file_id):
                'study': report_obj.bnids.first().sample.study,
                'report_obj': report_obj}
     return render(request, 'viewer/report/view_report.html', context)
+
+
+@csrf_exempt
+def view_report_right_sidebar(request):
+    # Inflate JSON into Python dictionary
+    record = simplejson.loads(request.POST.get('json_str'))
+
+    # Correct for gene entry
+    record['gene_link_out'] = record['gene']
+    try:
+        record['gene'] = re.search(r'/Search/keyword/(\S+)"', record['gene']).group(1)
+    except:
+        record['gene'] = 'N/A'
+        record['gene_link_out'] = None
+
+    # Break up 'extra_info'
+    record['extra_info'] = dict([e.split('=') for e in record['extra_info'].split(';')])
+
+    # Render to template
+    context = {'record': record}
+    return render(request, 'viewer/report/view_report_right_sidebar.html', context)
 
 
 # get info to upload reports
