@@ -556,6 +556,14 @@ def view_report(request, file_id):
             if effect not in effect_dict['all']:
                 effect_dict['all'][effect] = 0
             effect_dict['all'][effect] += 1
+            if impact in strong and ext['pct_tumor_alt'] >= 5 and ('exac_maf' not in ext or ext['exac_maf'] <= 0.01):
+                if impact not in impact_dict['conf']:
+                    impact_dict['conf'][impact] = 0
+                impact_dict['conf'][impact] += 1
+                if effect not in effect_dict['conf']:
+                    effect_dict['conf'][effect] = 0
+                effect_dict['conf'][effect] += 1
+
 
     # print report_data
     report_html = str(report_parser.json_from_ajax(variants))
