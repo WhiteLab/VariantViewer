@@ -543,6 +543,20 @@ def view_report(request, file_id):
 
     # Ajaxy version to grab variants from db
     variants = report_obj.variant_set.all()
+    impact_dict = {'all': {}, 'conf': {}}
+    effect_dict = {'all': {}, 'conf': {}}
+    strong = {'HIGH': 1, 'MODERATE': 1}
+    for var in variants:
+        ext = dict([e.split('=') for e in var.extra_info.split(';')])
+        if ext['on/off-target'] == 'ON':
+            (impact, effect) = (ext['impact'], ext['effect'])
+            if impact not in impact_dict['all']:
+                impact_dict['all'][impact] = 0
+            impact_dict['all'][impact] += 1
+            if effect not in effect_dict['all']:
+                effect_dict['all'][effect] = 0
+            effect_dict['all'][effect] += 1
+
     # print report_data
     report_html = str(report_parser.json_from_ajax(variants))
 
@@ -579,6 +593,7 @@ def view_report_right_sidebar(request):
 
     # Break up 'extra_info'
     record['extra_info'] = dict([e.split('=') for e in record['extra_info'].split(';')])
+    # create summary stats for report, on-target hits
 
     # Render to template
     context = {'record': record}
