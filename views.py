@@ -535,14 +535,7 @@ def edit_report(request, report_id):
                                   context_instance=RequestContext(request))
 
 
-@login_required
-def view_report(request, file_id):
-    # build context from file
-    print 'file_id: %s' % file_id
-    report_obj = Report.objects.get(pk=file_id)
-
-    # Ajaxy version to grab variants from db
-    variants = report_obj.variant_set.all()
+def reports_summary(variants):
     impact_dict = {'all': {}, 'conf': {}}
     effect_dict = {'all': {}, 'conf': {}}
     strong = {'HIGH': 1, 'MODERATE': 1}
@@ -563,7 +556,19 @@ def view_report(request, file_id):
                 if effect not in effect_dict['conf']:
                     effect_dict['conf'][effect] = 0
                 effect_dict['conf'][effect] += 1
+    return impact_dict, effect_dict
 
+
+@login_required
+def view_report(request, file_id):
+    # build context from file
+    print 'file_id: %s' % file_id
+    report_obj = Report.objects.get(pk=file_id)
+
+    # Ajaxy version to grab variants from db
+    variants = report_obj.variant_set.all()
+
+    (impact_dict, effect_dict) = reports_summary(variants)
 
     # print report_data
     report_html = str(report_parser.json_from_ajax(variants))
@@ -582,7 +587,8 @@ def view_report(request, file_id):
                'viewing_report': True,
                'filename': report_obj.report_file.name.split('/')[1],
                'study': report_obj.bnids.first().sample.study,
-               'report_obj': report_obj}
+               'report_obj': report_obj, 'impact_json': simplejson.dumps(impact_dict),
+               'effect_json': simplejson.dumps(effect_dict)}
     return render(request, 'viewer/report/view_report.html', context)
 
 

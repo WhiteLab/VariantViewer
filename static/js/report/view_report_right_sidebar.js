@@ -26,7 +26,7 @@ $(document).ready(function(){
     if (absolute_normal_alt && absolute_normal_ref){
         $('#normal_chart').highcharts($.extend(common_options, {
             title: {
-                text: 'Normal'
+                text: 'High Confidence Impact'
             },
             series: [{
                 name: 'Normal',
