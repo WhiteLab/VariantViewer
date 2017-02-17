@@ -1,7 +1,7 @@
 /**
  * Created by dfitzgerald on 8/23/16.
  */
-$(document).ready(function(){
+$(document).ready(function() {
     var common_options = {
         chart: {
             type: 'pie',
@@ -15,51 +15,29 @@ $(document).ready(function(){
                 animation: {duration: 300},
                 dataLabels: {
                     enabled: true,
-                    formatter: function(){
-                        return this.point.name + ': ' + this.y + ' (' + Math.round(this.percentage*100)/100 + '%)'
+                    formatter: function () {
+                        return this.point.name + ': ' + this.y + ' (' + Math.round(this.percentage * 100) / 100 + '%)'
                     }
                 }
             }
         }
     };
 
-    if (absolute_normal_alt && absolute_normal_ref){
-        $('#normal_chart').highcharts($.extend(common_options, {
-            title: {
-                text: 'High Confidence Impact'
-            },
-            series: [{
-                name: 'Normal',
-                data: [{
-                    name: 'Alt ' + alt_base,
-                    y: absolute_normal_alt
-                }, {
-                    name: 'Ref ' + ref_base,
-                    y: absolute_normal_ref
-                }]
-            }]
-        }));
-    } else {
-        $('#normal_chart').html('Normal Plot Not Available');
+    var vals = {};
+    for (var impact in impact_json['conf']) {
+        if (impact_json['conf'].hasOwnProperty(impact)) {
+            vals.push({name: impact, y: impact_json['conf'][impact]});
+        }
     }
 
-    if (absolute_tumor_alt && absolute_tumor_ref) {
-        $('#tumor_chart').highcharts($.extend(common_options, {
-            title: {
-                text: 'Tumor'
-            },
-            series: [{
-                name: 'Tumor',
-                data: [{
-                    name: 'Alt ' + alt_base,
-                    y: absolute_tumor_alt
-                }, {
-                    name: 'Ref ' + ref_base,
-                    y: absolute_tumor_ref
-                }]
-            }]
-        }));
-    } else {
-        $('#tumor_chart').html('Tumor Plot Not Available');
-    }
+    $('#conf_chart').highcharts($.extend(common_options, {
+        title: {
+            text: 'High Confidence Impact'
+        },
+        series: [{
+            name: 'High Confidence Impact',
+            data: vals
+        }]
+    }));
 });
+

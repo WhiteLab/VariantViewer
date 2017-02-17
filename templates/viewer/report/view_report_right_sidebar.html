@@ -5,56 +5,12 @@
 </script>
 <script src="{% static 'js/report/view_report_right_sidebar.js' %}"></script>
 
-<div class="row">
-    <div class="col-sm-12">
-        <h3>
-            <span class="fa fa-map-o"></span>&nbsp;&nbsp;{{ record.gene }}
-            <span style="float:right">{{ record.chrom }}:{{ record.pos }}&nbsp;&nbsp;<span class="fa fa-map-marker"></span></span>
-        </h3>
-
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-sm-12">
-        <h4>T/N Percent Alt Ratio: {{ record.tn_pct_alt_ratio }}</h4>
-    </div>
-</div>
-
-<div class="row" style="border-bottom:1px solid #E5E5E5;margin-bottom:25px">
-    <div class="col-sm-6 igsbviewer-centered">
-        <h4>Reference<br/>{{ record.ref }}</h4>
-    </div>
-    <div class="col-sm-6 igsbviewer-centered">
-        <h4>Alternative<br/>{{ record.alt }}</h4>
-    </div>
-</div>
-
 <!-- Highcharts plots -->
-<div class="row" style="border-bottom:1px solid #E5E5E5;margin-bottom:25px">
-    <div class="col-lg-12" id="tumor_chart"></div>
-    <div class="col-lg-12">
-        <h4>Reference Count: {{ record.tumor_ref_count }}</h4>
-        <h4>Alternative Count: {{ record.tumor_alt_count }}</h4>
-        <h4>Percent Alternative: {{ record.pct_tumor_alt }}%</h4>
-    </div>
-</div>
+
 
 <div class="row" style="border-bottom:1px solid #E5E5E5">
-    <div class="col-lg-12" id="normal_chart"></div>
-    <div class="col-lg-12">
-        <h4>Reference Count: {{ record.normal_ref_count }}</h4>
-        <h4>Alternative Count: {{ record.normal_alt_count }}</h4>
-        <h4>Percent Alternative: {{ record.pct_normal_alt}}%</h4>
-    </div>
+    <div class="col-lg-12" id="conf_chart"></div>
+
 </div>
 
-<!-- Extra info -->
-<div class="row">
-    <div class="col-sm-12">
-        <h3><span class="fa fa-tags"></span>&nbsp;&nbsp;Extra Info</h3>
-        {% for k, v in record.extra_info.iteritems %}
-        {{ k }}: {{ v }}<br/>
-        {% endfor %}
-    </div>
-</div>
+

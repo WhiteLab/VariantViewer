@@ -124,6 +124,20 @@
         <div class="col-lg-4 viewer-side igsbviewer-skinny-scroll" id="igsbviewer-right-panel">
             <h3>Report summary</h3>
         </div>
+        <script>
+        var impact_json = {{ impact_json }};
+        var effect_json = parseFloat({{ effect_json }});
+        </script>
+        <script src="{% static 'js/report/view_report_right_sidebar.js' %}"></script>
+
+        <!-- Highcharts plots -->
+
+
+        <div class="row" style="border-bottom:1px solid #E5E5E5">
+            <div class="col-lg-12" id="conf_chart"></div>
+
+        </div>
+
     </div>
 </div>
 
