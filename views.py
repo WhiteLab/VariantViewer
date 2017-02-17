@@ -539,8 +539,13 @@ def reports_summary(variants):
     impact_dict = {'all': {}, 'conf': {}}
     effect_dict = {'all': {}, 'conf': {}}
     strong = {'HIGH': 1, 'MODERATE': 1}
+    print 'processing report'
+    print dir(variants)
     for var in variants:
+        print 'processsing var'
+        print dir(var)
         ext = dict([e.split('=') for e in var.extra_info.split(';')])
+        print var.gene_name
         if ext['on/off-target'] == 'ON':
             (impact, effect) = (ext['impact'], ext['effect'])
             if impact not in impact_dict['all']:
@@ -549,13 +554,15 @@ def reports_summary(variants):
             if effect not in effect_dict['all']:
                 effect_dict['all'][effect] = 0
             effect_dict['all'][effect] += 1
-            if impact in strong and ext['pct_tumor_alt'] >= 5 and ('exac_maf' not in ext or ext['exac_maf'] <= 0.01):
+            if impact in strong and var.pct_tumor_alt >= 5 and ('exac_maf' not in ext or float(ext['exac_maf']) <= 0.01
+            and var.tn_pct_alt_ratio >= 2):
                 if impact not in impact_dict['conf']:
                     impact_dict['conf'][impact] = 0
                 impact_dict['conf'][impact] += 1
                 if effect not in effect_dict['conf']:
                     effect_dict['conf'][effect] = 0
                 effect_dict['conf'][effect] += 1
+        # print 'Finished for ' + var['gene_name']
     return impact_dict, effect_dict
 
 
