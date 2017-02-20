@@ -4,29 +4,66 @@
 $(document).ready(function(){
     var $reportTable = $('#report-table');
     var tableHeaders = [];
-    var $currentlySelected;
     $reportTable.find('thead tr').first().find('th').each(function(){
         tableHeaders.push($(this).text());
     });
 
-    $reportTable.find('tbody tr').click(function(){
-        // Don't fetch new plots if clicked mutiple times
-        if ($currentlySelected === JSON.stringify($(this))) return;
-        $currentlySelected = JSON.stringify($(this));
 
-        var record = {};
-        var i = 0;
-        $(this).find('td').each(function(){
-            record[tableHeaders[i]] = $(this).html();
-            i++;
-        });
+    // Get sidebar content
+    var common_options = {
+        chart: {
+            type: 'pie',
+            backgroundColor: '#FBFCFD'
+        },
+        credits: {
+            enabled: false
+        },
+        plotOptions: {
+            series: {
+                animation: {duration: 300},
+                dataLabels: {
+                    enabled: true,
+                    formatter: function () {
+                        return this.point.name + ': ' + this.y + ' (' + Math.round(this.percentage * 100) / 100 + '%)'
+                    }
+                }
+            }
+        }
+    };
 
-        $('#igsbviewer-right-panel').text('Loading...');
-        // Get sidebar content
-        $.post('/viewer/report/get_right_sidebar/', {
-            json_str: JSON.stringify(record)
-        }, function(data){
-            $('#igsbviewer-right-panel').html($(data));
-        });
-    });
+    var hi_impact_vals = [];
+    for (var impact in effect_json['conf']) {
+        if (impact_json['conf'].hasOwnProperty(impact)) {
+            hi_impact_vals.push({name: impact, y: effect_json['conf'][impact]});
+        }
+    }
+
+    $('#conf_chart').highcharts($.extend(common_options, {
+        title: {
+            text: 'High Confidence Impact'
+        },
+        series: [{
+            name: 'High Confidence Impact',
+            data: hi_impact_vals
+        }]
+    }));
+
+    var hi_effect_vals = [];
+    for (var effect in effect_json['conf']) {
+        if (effect_json['conf'].hasOwnProperty(effect)) {
+            hi_effect_vals.push({name: effect, y: effect_json['conf'][effect]});
+        }
+    }
+
+    $('#conf_eff_chart').highcharts($.extend(common_options, {
+        title: {
+            text: 'High Confidence Effects'
+        },
+        series: [{
+            name: 'High Confidence Effects',
+            data: hi_effect_vals
+        }]
+    }));
+
+
 });

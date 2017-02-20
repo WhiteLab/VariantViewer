@@ -2,50 +2,11 @@
 {% load staticfiles %}
 
 {% block extra_js %}
-<script src="{% static 'js/report/view_report.js' %}"></script>
 <script>
-    $(document).ready(function() {
-
-{#        $('#report-table').dynatable();#}
-{#        $.fn.dataTable.Api.register( 'column().title()', function () {#}
-{#            var colheader = this.header();#}
-{#            return $(colheader).text().trim();#}
-{#        });#}
-
-{#        var $table = $('#report-table').DataTable( {#}
-{#            scrollY: 400,#}
-{#            scrollX: true,#}
-{#            autowidth: false,#}
-{#            scrollCollapse: true,#}
-{#            paging: false,#}
-{#            "dom": 'RC<"clear">lfrtip',#}
-{#            <!--"initComplete": function(settings, json) {-->#}
-{#                <!--&lt;!&ndash;console.log('inside the thing');&ndash;&gt;-->#}
-{#            <!--}-->#}
-{#        });#}
-
-        // get header indexes
-        <!--var colJson = {};-->
-        <!--var i = 0;-->
-        <!--$table.columns().every( function () {-->
-            <!--var title = this.title();-->
-            <!--colJson[title] = i;-->
-            <!--i++;-->
-        <!--});-->
-        <!--var to_string = JSON.stringify(colJson, null, 2);-->
-        // hide selected columns
-        <!--var hideCols = ['id', 'report_id'];-->
-        <!--for (var c in hideCols) {-->
-            <!--$table.column( colJson[hideCols[c]] ).visible(false);-->
-        <!--}-->
-
-
-
-
-
-
-    });
+    var impact_json = {{ impact_json|safe }};
+    var effect_json = {{ effect_json|safe }};
 </script>
+<script src="{% static 'js/report/view_report.js' %}"></script>
 
 {% endblock %}
 
@@ -123,20 +84,18 @@
         </div>
         <div class="col-lg-4 viewer-side igsbviewer-skinny-scroll" id="igsbviewer-right-panel">
             <h3>Report summary</h3>
+            <!-- Highcharts plots -->
+            <div class="row" style="border-bottom:1px solid #E5E5E5">
+
+                <div class="col-lg-12" id="conf_chart"></div>
+
+            </div>
+            <div class="row" style="border-bottom:1px solid #E5E5E5">
+                <div class="col-lg-12" id="conf_ceff_hart"></div>
+
+            </div>
         </div>
-        <script>
-        var impact_json = {{ impact_json }};
-        var effect_json = parseFloat({{ effect_json }});
-        </script>
-        <script src="{% static 'js/report/view_report_right_sidebar.js' %}"></script>
 
-        <!-- Highcharts plots -->
-
-
-        <div class="row" style="border-bottom:1px solid #E5E5E5">
-            <div class="col-lg-12" id="conf_chart"></div>
-
-        </div>
 
     </div>
 </div>

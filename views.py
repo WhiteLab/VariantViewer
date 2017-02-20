@@ -584,7 +584,7 @@ def view_report(request, file_id):
     # report_data = report_parser.json_from_report(
     #     os.path.join(report_parser.get_media_path(),
     #                  report_obj.report_file.name))
-    # report_html = str(report_data.html)
+    # report_html = str(report_data.html)z`
 
     # add table class and id
     replace_string = "<table class=\"table table-hover\" id=\"report-table\">"
@@ -597,28 +597,6 @@ def view_report(request, file_id):
                'report_obj': report_obj, 'impact_json': simplejson.dumps(impact_dict),
                'effect_json': simplejson.dumps(effect_dict)}
     return render(request, 'viewer/report/view_report.html', context)
-
-
-@csrf_exempt
-def view_report_right_sidebar(request):
-    # Inflate JSON into Python dictionary
-    record = simplejson.loads(request.POST.get('json_str'))
-
-    # Correct for gene entry
-    record['gene_link_out'] = record['gene']
-    try:
-        record['gene'] = re.search(r'/Search/keyword/(\S+)"', record['gene']).group(1)
-    except:
-        record['gene'] = 'N/A'
-        record['gene_link_out'] = None
-
-    # Break up 'extra_info'
-    record['extra_info'] = dict([e.split('=') for e in record['extra_info'].split(';')])
-    # create summary stats for report, on-target hits
-
-    # Render to template
-    context = {'record': record}
-    return render(request, 'viewer/report/view_report_right_sidebar.html', context)
 
 
 # get info to upload reports
