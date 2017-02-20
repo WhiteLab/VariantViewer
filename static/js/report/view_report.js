@@ -32,9 +32,9 @@ $(document).ready(function(){
     };
 
     var hi_impact_vals = [];
-    for (var impact in effect_json['conf']) {
+    for (var impact in impact_json['conf']) {
         if (impact_json['conf'].hasOwnProperty(impact)) {
-            hi_impact_vals.push({name: impact, y: effect_json['conf'][impact]});
+            hi_impact_vals.push({name: impact, y: impact_json['conf'][impact]});
         }
     }
 
@@ -64,6 +64,37 @@ $(document).ready(function(){
             data: hi_effect_vals
         }]
     }));
+    var all_impact_vals = [];
+    for (var impact_all in impact_json['all']) {
+        if (impact_json['all'].hasOwnProperty(impact_all)) {
+            all_impact_vals.push({name: impact_all, y: impact_json['all'][impact_all]});
+        }
+    }
 
+    $('#all_chart').highcharts($.extend(common_options, {
+        title: {
+            text: 'All On-target Impacts'
+        },
+        series: [{
+            name: 'All On-target Impacts',
+            data: all_impact_vals
+        }]
+    }));
 
+    var all_effect_vals = [];
+    for (var effect_all in effect_json['all']) {
+        if (effect_json['all'].hasOwnProperty(effect_all)) {
+            all_effect_vals.push({name: effect_all, y: effect_json['all'][effect_all]});
+        }
+    }
+
+    $('#all_eff_chart').highcharts($.extend(common_options, {
+        title: {
+            text: 'All On-target Effects'
+        },
+        series: [{
+            name: 'All On-target Effects',
+            data: all_effect_vals
+        }]
+    }));
 });

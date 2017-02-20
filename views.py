@@ -539,15 +539,13 @@ def reports_summary(variants):
     impact_dict = {'all': {}, 'conf': {}}
     effect_dict = {'all': {}, 'conf': {}}
     strong = {'HIGH': 1, 'MODERATE': 1}
-    print 'processing report'
-    print dir(variants)
     for var in variants:
-        print 'processsing var'
-        print dir(var)
         ext = dict([e.split('=') for e in var.extra_info.split(';')])
-        print var.gene_name
         if ext['on/off-target'] == 'ON':
             (impact, effect) = (ext['impact'], ext['effect'])
+            effect = effect.replace('&', '<br>')
+            effect = effect.replace('_', ' ')
+            print effect
             if impact not in impact_dict['all']:
                 impact_dict['all'][impact] = 0
             impact_dict['all'][impact] += 1
