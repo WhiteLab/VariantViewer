@@ -35,12 +35,20 @@
             <td class="bnid">{{ s.bnid.bnid }}</td>
             <td class="bnid-library-type">{{ s.bnid.library_type}}</td>
             <td class="submit-date">{{ s.submit_date }}</td>
-            <td class="sequence-date">{%if s.status != 'Sample submitted for sequencing' and s.status != 'SEQUENCED' and s.status != 'FAILED QNS'%}<a
-                    href="/~mbrown/FASTQC/{{s.bnid.bnid}}/QC/" >{{ s.sequence_date }}</a>{% else %}{{ s.sequence_date }}
-                {%endif%}</td>
-            <td class="align-date">{%if s.status != 'Sample submitted for sequencing' and s.status != 'SEQUENCED' and s.status != 'FAILED QNS'%}<a
-                    href="/~mbrown/ALIGN/{{s.bnid.bnid}}/QC/" >{{ s.align_date }}</a>{% else %}{{ s.align_date }}
-                {%endif%}</td>
+            <td class="sequence-date">
+                {%if s.status != 'Sample submitted for sequencing' and s.status != 'SEQUENCED' and s.status != 'FAILED QNS'%}
+                    <a href="/~mbrown/FASTQC/{{s.bnid.bnid}}/QC/" >{{ s.sequence_date }}</a>
+                {% else %}
+                    <span>{{ s.sequence_date }}</span>
+                {%endif%}
+            </td>
+            <td class="align-date">
+                {%if s.status != 'Sample submitted for sequencing' and s.status != 'SEQUENCED' and s.status != 'FAILED QNS'%}
+                    <a href="/~mbrown/ALIGN/{{s.bnid.bnid}}/QC/" >{{ s.align_date }}</a>
+                {% else %}
+                    <span>{{ s.align_date }}</span>
+                {%endif%}
+            </td>
             <td class="analysis-date">{{ s.analysis_date }}</td>
             <td class="status">{{ s.status }}</td>
         </tr>
@@ -74,13 +82,13 @@
         var statusTable = $('#status-table');
         var headers = [];
         statusTable.children('thead').find('th').each(function() {
-            headers.push($(this).text());
+            headers.push($(this).text().trim());
         });
         tsv.push(headers);
         statusTable.children('tbody').find('tr').each(function() {
             var record = [];
             $(this).children('td').each(function() {
-                record.push($(this).text())
+                record.push($(this).text().trim());
             });
             tsv.push(record);
         });
