@@ -1,5 +1,4 @@
 import simplejson
-import re
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import permission_required, login_required
@@ -310,36 +309,11 @@ def edit_metadata(request, sample_id):
             if bid not in new_bids:
                 sample.bnid_set.get(bnid=bid).delete()
 
-
-
-        # for old_bid in old_bids:
-        #     old_bid.delete()
-        #
-        # for new_bid in new_bids:
-        #     new_bid_object = Bnid()
-        #     new_bid_object.bnid = new_bid
-        #     new_bid_object.description = new_description
-        #     new_bid_object.sample = sample
-        #     new_bid_object.save()
-
-        print new_bids
-        print new_description
-        print new_cellularity
-
-        # s = Study.objects.get(pk=study_id)
-        # updated_form = StudyForm(request.POST, instance=s)
-        # if updated_form.is_valid():
-        #     updated_form.save()
         return HttpResponseRedirect(reverse('manage_metadata'))
     else:
         sample = Sample.objects.get(pk=sample_id)
         bids = sample.bnid_set.all()
 
-        # study_obj = Study.objects.get(pk=study_id)
-        # sform = StudyForm(instance=study_obj)
-        # context = {'study_form': sform, 'name': study_obj.name, 'pk': study_obj.pk}
-        # context.update(csrf(request))
-        print sample.description
         metadata_fields = [
             {
                 'id': 'metadata_bids',
@@ -578,12 +552,6 @@ def view_report(request, file_id):
     # print report_data
     report_html = str(report_parser.json_from_ajax(variants))
 
-    # load from file version
-    # report_data = report_parser.json_from_report(
-    #     os.path.join(report_parser.get_media_path(),
-    #                  report_obj.report_file.name))
-    # report_html = str(report_data.html)z`
-
     # add table class and id
     replace_string = "<table class=\"table table-hover\" id=\"report-table\">"
     report_html = report_html.replace("<table>", replace_string)
@@ -820,53 +788,6 @@ def view_share_data_expired(request):
 
 def view_share_data_dne(request):
     return render(request, 'viewer/error/share_data_dne.html')
-
-
-# @user_passes_test(in_proj_user_group)
-# def share_report(request, report_id=None):
-#     if request.method == 'POST':
-#         shared_data_form = SharedDataForm(request.POST, instance=SharedData())
-#         if shared_data_form.is_valid():
-#             shared_data = shared_data_form.save(commit=False)
-#             shared_data.user = request.user
-#             shared_data.creation_date = date.today()
-#             shared_data.save()
-#             shared_data_form.save_m2m()
-#             # format the email better here TODO
-#             subject = 'Shared Variant Report: {}'.format(
-#                 shared_data_form['name'].value())
-#             absolute_uri = request.build_absolute_uri('/')
-#             uuid = str(shared_data.uuid).replace('-', '')
-#             share_url = absolute_uri + 'viewer/shared/view/' + uuid + '/'
-#             recipients = [str(contact) for contact in shared_data.shared_recipient.all()]
-#
-#             message = 'A variant report has been shared with you. Go to the following link to view: '
-#             message += share_url
-#
-#             print subject
-#             print message
-#
-#             send_mail(subject, message, 'no-reply@uchicago.edu',
-#                       recipients, fail_silently=False)
-#
-#         return HttpResponseRedirect('/viewer/report/')
-#             # I don't know that we should necessarily redirect
-#             # Maybe just close the modal box, return to page?
-#             # but then how do we assure success? Or report failure? TODO
-#     else:
-#         project_pk = request.session.get('viewing_project', None)
-#         if project_pk is None:
-#             return HttpResponseRedirect(reverse('no_project)
-#         report = Report.objects.get(pk=report_id)
-#         shared_data_form = SharedDataForm(instance=SharedData(), initial={
-#             'field_lookup': simplejson.dumps({'report_id': report_id})
-#         })
-#         shared_data_form.fields['shared_recipient'].queryset = Project.objects.get(pk=project_pk).contact_set.all()
-#         context = {
-#             'report_name': report.report_file.name[2:],
-#             'shared_data_form': shared_data_form
-#         }
-#         return render(request, 'viewer/share/share_report.html', context)
 
 
 def share_search(request):

@@ -16,6 +16,7 @@ downloads/
 eggs/
 .eggs/
 lib64/
+effd.migrations/
 migrations/
 files/
 parts/
