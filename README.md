@@ -12,7 +12,7 @@ Web application to load, annotate, parse, search, and display annotated Variant 
 
 ###Python:
 
-* Django==1.7.4
+* Django==1.8.14
 * EasyProcess==0.1.9
 * PyVirtualDisplay==0.1.5
 * argparse==1.2.1
@@ -21,11 +21,14 @@ Web application to load, annotate, parse, search, and display annotated Variant 
 * django-crontab==0.6.0
 * django-extensions==1.5.2
 * django-password-reset==0.7
+* django-sslserver==0.15
 * django-uuidfield==0.5.0
+* docopt==0.6.2
+* gunicorn==19.3.0
 * ipython==3.1.0
 * mysqlclient==1.3.5
+* psycopg2==2.6.1
 * pydot==1.0.2
-* pygraphviz==1.2
 * pyparsing==1.5.7
 * pytz==2014.10
 * requests==2.6.0
@@ -33,7 +36,6 @@ Web application to load, annotate, parse, search, and display annotated Variant 
 * simplejson==3.6.5
 * six==1.9.0
 * tablib==0.10.0
-* uWSGI==2.0.10
 * wsgiref==0.1.2
 
 ---
