@@ -238,15 +238,12 @@ def new_metadata(request):
     if request.method == 'POST':
         try:
             sheet_data = simplejson.loads(request.POST.get('sheet'))
-            print 'Found sheet data in post'
         except:
             input_data = simplejson.loads(request.readlines()[0])
             sheet_data = input_data['sheet']
         for row in sheet_data:
             row = [r.strip() for r in row]
             (study_name, sample_name, bid, library_type, description, cellularity) = row
-
-            print 'Creating entry for ' + bid
             if not Study.objects.filter(name=study_name).exists():
                 # Notify user
                 print 'Did not find study info'
@@ -398,7 +395,6 @@ def update_status(request):
         error = 'No metadata for bid ' + bid
         return HttpResponse(error)
     try:
-        print 'Saving new object'
         cur.save()
         json_response = cur.__dict__
         pretty = simplejson.dumps(json_response, sort_keys=True, indent=4)
@@ -455,7 +451,6 @@ def manage_report(request, set_viewing_project_pk=None):
 @permission_required('viewer.add_report', login_url=reverse_lazy('viewer_restricted'))
 def upload_report(request):
     if request.method == 'POST':
-        print "POST from upload_report"
         if request.FILES:
             rform = ReportForm(request.POST, request.FILES)
         else:
@@ -519,7 +514,6 @@ def reports_summary(variants):
             (impact, effect) = (ext['impact'], ext['effect'])
             effect = effect.replace('&', '<br>')
             effect = effect.replace('_', ' ')
-            print effect
             if impact not in impact_dict['all']:
                 impact_dict['all'][impact] = 0
             impact_dict['all'][impact] += 1
@@ -836,7 +830,6 @@ def get_samples(request, study_id=None, **kwargs):
 
 @login_required
 def get_bnids_by_study(request, study_id=None):
-    print "study_id: {}".format(study_id)
     bnid_dict = dict()
     if study_id:
         study = Study.objects.get(pk=study_id)
@@ -856,7 +849,6 @@ def get_studies(request):
         studies = Study.objects.all()
         for study in studies:
             study_dict[study.name] = study.id
-        print 'get study command ok'
         return HttpResponse(simplejson.dumps(study_dict))
     except Exception as e:
         error = {'Message': e.message}
@@ -865,7 +857,6 @@ def get_studies(request):
 
 @login_required
 def load_variants(request, report_id=None):
-    print "Load Variants for Report ID: {}".format(report_id)
     report_obj = Report.objects.get(pk=report_id)
     report_parser.load_into_db(report_obj)
     return HttpResponseRedirect(reverse('manage_report'))
@@ -914,7 +905,6 @@ def populate_sidebar(request):
                 'current': True if current_project_pk == str(project.pk) else False
             }
             nav_data.append(project_data)
-        # print nav_data
         if len(nav_data) == 0:
             return HttpResponse('<li><a href="#">No Projects Available</a></li>')
         return render(request, 'viewer/sidebar/project_dropdowns.html', {'projects': nav_data})
@@ -977,8 +967,6 @@ def render_gene_profile(reports, gene_name):
         for g in gene:
             mutation_dict[g.ref + '>' + g.alt] += 1
 
-    print mutation_dict
-
     return {
         'gene': {
             'name': gene_name,
@@ -1032,9 +1020,6 @@ def share_report(request):
 
             message = 'A variant report has been shared with you. Go to the following link to view: '
             message += share_url
-
-            print subject
-            print message
 
             # send_mail(subject, message, 'no-reply@uchicago.edu',
             #           recipients, fail_silently=False)
