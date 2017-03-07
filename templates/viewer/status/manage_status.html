@@ -27,7 +27,7 @@
                 <th class="sort listjs-sort-header" data-sort="status">Status</th>
 			</tr>
 		</thead>
-        <tbody class="list">
+        <tbody class="list" id="status-tbody">
         {% for s in statuses %}
         <tr>
             <td class="study-name">{{ s.study.name }}</td>
@@ -98,6 +98,20 @@
             finaltsv += tsv[i].join('\t') + '\n';
         }
         saveAs(new Blob([finaltsv], {type: "text/plain;charset=utf-8"}), filename);
+    });
+
+    var $statusTbody = $('#status-tbody');
+    $(document).ready(function(){
+        var total_rows = {{ total_rows }};
+
+        for (var j = 3, start = 1; start <= total_rows;j++) {
+            var nextN = Math.floor(Math.log(j) * 10);
+            var stop = start + nextN - 1;
+            $.get('/viewer/status/ajax_rows/' + start + '/' + stop + '/', function(data){
+                $statusTbody.append($(data));
+            });
+            start = stop + 1;
+        }
     });
 
 

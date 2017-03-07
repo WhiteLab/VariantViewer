@@ -62,6 +62,8 @@ urlpatterns = patterns('',
                        url(r'^status/update_status/$', views.update_status, name='update_status'),
                        url(r'^status/check_status/$', views.check_status, name='check_status'),
                        url(r'^status/get_all_statuses/$', views.get_all_statuses, name='get_all_statuses'),
+                       url(r'^status/ajax_rows/(?P<start>\d+)/(?P<stop>\d+)/$', views.manage_status_ajax_rows,
+                           name='manage_status_ajax_rows'),
 
                        # Study
                        url(r'^study/$', views.manage_study, name='manage_study'),
