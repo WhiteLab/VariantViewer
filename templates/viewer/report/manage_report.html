@@ -111,8 +111,6 @@
                 <th>Name</th>
 
                 <th></th>
-{#				<th>Sample(s)</th>#}
-{#				<th></th>#}
 				<th>Variants</th>
 				<th>Date Uploaded</th>
                 <th></th>
@@ -137,12 +135,6 @@
                 <td></td>
                 {% endif %}
 
-{#				<td>#}
-{#					{% for b in r.bnids.all %}#}
-{#						{{b.sample}} ({{b.bnid}})<br>#}
-{#					{% endfor %}#}
-{#				</td>#}
-{#				<td>{{r.genome}}<br>{{r.caller}}</td>#}
                 <td>
                     <h6><span class="badge">{{ r.variant_set.all | length }}</span></h6>
                 </td>

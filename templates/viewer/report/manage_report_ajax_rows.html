@@ -1,0 +1,36 @@
+{% for r in reports %}
+<tr>
+    <td><label style="display:block;text-align:center"><input type="checkbox" data-reportid="{{ r.pk }}" class="multiplereports"></label></td>
+    {% if r.report_file.name %}
+    <td>
+        {{r.study}}
+    </td>
+    <td>
+        {{r.name}}
+    </td>
+    <td>
+        <span class="fa fa-2x fa-desktop igsbviewer-view-report" data-pk="{{r.pk}}" data-csrf="{% csrf_token %}"></span>
+    </td>
+    {% else %}
+    <td></td>
+    <td></td>
+    {% endif %}
+
+    <td>
+        <h6><span class="badge">{{ r.variant_set.all | length }}</span></h6>
+    </td>
+
+    <td>{{r.upload_date}}</td>
+    <td>
+
+    </td>
+    <td>
+        {% if perms.viewer.change_report %}
+        <span class="fa fa-2x fa-pencil-square-o igsbviewer-modal-edit-button" data-pk="{{r.pk}}"></span>&nbsp;&nbsp;
+        <span class="fa fa-2x fa-trash igsbviewer-modal-delete-button" data-pk="{{r.pk}}"></span>
+        <span class="fa fa-2x fa-share-alt igsbviewer-modal-share-button" data-pk="{{r.pk}}"></span>
+        {% endif %}
+    </td>
+
+</tr>
+{% endfor %}

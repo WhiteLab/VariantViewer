@@ -360,6 +360,7 @@ def delete_sample(request, sample_id):
 Status Model
 '''
 
+
 @login_required
 def manage_status(request, set_viewing_project_pk=None):
     project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
@@ -374,6 +375,7 @@ def manage_status(request, set_viewing_project_pk=None):
         'total_rows': len(statuses)
     }
     return render(request, 'viewer/status/manage_status.html', context)
+
 
 @login_required
 def manage_status_ajax_rows(request, start, stop):
@@ -454,13 +456,25 @@ def manage_report(request, set_viewing_project_pk=None):
     if project_pk is None:
         return HttpResponseRedirect(reverse('no_project'))
     viewable_studies = request.user.userprofile.viewable_studies.all()
+    reports = Report.objects.filter(study__project__pk=project_pk).filter(study__in=viewable_studies)
     context = {
-        'reports': Report.objects.filter(study__project__pk=project_pk).filter(study__in=viewable_studies),
+        'reports': reports[0:1],
         'project_name': Project.objects.get(pk=project_pk).name,
         'variant_fields': Variant._meta.get_all_field_names()
     }
     context.update(csrf(request))
     return render(request, 'viewer/report/manage_report.html', context)
+
+
+@login_required
+def manage_report_ajax_rows(request, start, stop):
+    project_pk = filter_on_project(request.user, request.session)
+    if project_pk is None:
+        return HttpResponseRedirect(reverse('no_project'))
+    viewable_studies = request.user.userprofile.viewable_studies.all()
+    reports = Report.objects.filter(study__project__pk=project_pk, study__in=viewable_studies)[int(start):int(stop) + 1]
+    context = {'reports': reports}
+    return render(request, 'viewer/status/manage_report_ajax_rows.html', context)
 
 
 @permission_required('viewer.add_report', login_url=reverse_lazy('viewer_restricted'))
