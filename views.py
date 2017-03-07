@@ -367,11 +367,26 @@ def manage_status(request, set_viewing_project_pk=None):
         return HttpResponseRedirect(reverse('no_project'))
     project = Project.objects.get(pk=project_pk)
     viewable_studies = request.user.userprofile.viewable_studies.all()
+    statuses = Status.objects.filter(study__project__pk=project_pk).filter(study__in=viewable_studies)
     context = {
         'project_name': project.name,
-        'statuses': Status.objects.filter(study__project__pk=project_pk).filter(study__in=viewable_studies),
+        'statuses': statuses[0:1],
+        'total_rows': len(statuses)
     }
     return render(request, 'viewer/status/manage_status.html', context)
+
+@login_required
+def manage_status_ajax_rows(request, start, stop):
+    project_pk = filter_on_project(request.user, request.session)
+    if project_pk is None:
+        return HttpResponseRedirect(reverse('no_project'))
+    viewable_studies = request.user.userprofile.viewable_studies.all()
+    statuses = Status.objects.filter(study__project__pk=project_pk,
+                                     study__in=viewable_studies)[int(start):int(stop) + 1]
+    context = {
+        'statuses': statuses
+    }
+    return render(request, 'viewer/status/manage_status_ajax_rows.html', context)
 
 
 @permission_required('viewer.update_status', login_url=reverse_lazy('viewer_restricted'))
@@ -867,11 +882,11 @@ def get_all_projects(request):
     project_dict = {}
     for p in Project.objects.all():
         project_dict[p.pk] = p.name
-    return HttpResponse(simplejson.dump(project_dict),
+    return HttpResponse(simplejson.dumps(project_dict),
                         content_type="application/json")
 
 
-def filter_on_project(user, session, set_viewing_project_pk):
+def filter_on_project(user, session, set_viewing_project_pk=None):
     if set_viewing_project_pk is not None:
         if user.project_set.filter(pk=set_viewing_project_pk).exists():
             session['viewing_project'] = set_viewing_project_pk
