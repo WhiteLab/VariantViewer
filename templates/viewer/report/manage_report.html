@@ -116,7 +116,7 @@
                 <th></th>
 			</tr>
 		</thead>
-		<tbody>
+        <tbody class="list" id="report-tbody">
 			{% for r in reports %}
 			<tr>
                 <td><label style="display:block;text-align:center"><input type="checkbox" data-reportid="{{ r.pk }}" class="multiplereports"></label></td>
@@ -155,6 +155,8 @@
 
 			</tr>
 			{% endfor %}
+            <script>var total_rows = {{ total_rows }};</script>
+            <script src="{% static 'js/report/manage_report_ajax_rows.js' %}"></script>
 		</tbody>
 	</table>
 </div>

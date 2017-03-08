@@ -459,6 +459,7 @@ def manage_report(request, set_viewing_project_pk=None):
     reports = Report.objects.filter(study__project__pk=project_pk).filter(study__in=viewable_studies)
     context = {
         'reports': reports[0:1],
+        'total_rows': len(reports),
         'project_name': Project.objects.get(pk=project_pk).name,
         'variant_fields': Variant._meta.get_all_field_names()
     }
@@ -473,8 +474,12 @@ def manage_report_ajax_rows(request, start, stop):
         return HttpResponseRedirect(reverse('no_project'))
     viewable_studies = request.user.userprofile.viewable_studies.all()
     reports = Report.objects.filter(study__project__pk=project_pk, study__in=viewable_studies)[int(start):int(stop) + 1]
-    context = {'reports': reports}
-    return render(request, 'viewer/status/manage_report_ajax_rows.html', context)
+    context = {'reports': reports,
+               'project_name': Project.objects.get(pk=project_pk).name,
+               'variant_fields': Variant._meta.get_all_field_names()
+               }
+    context.update(csrf(request))
+    return render(request, 'viewer/report/manage_report_ajax_rows.html', context)
 
 
 @permission_required('viewer.add_report', login_url=reverse_lazy('viewer_restricted'))
@@ -557,14 +562,12 @@ def reports_summary(variants):
                 if effect not in effect_dict['conf']:
                     effect_dict['conf'][effect] = 0
                 effect_dict['conf'][effect] += 1
-        # print 'Finished for ' + var['gene_name']
     return impact_dict, effect_dict
 
 
 @login_required
 def view_report(request, file_id):
     # build context from file
-    print 'file_id: %s' % file_id
     report_obj = Report.objects.get(pk=file_id)
 
     # Ajaxy version to grab variants from db
