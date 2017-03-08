@@ -919,13 +919,10 @@ def populate_sidebar(request):
         for project in current_user.project_set.all():
             num_studies = project.study_set.all().count()
             num_samples = 0
-            num_bnids = 0
             num_reports = 0
             for study in project.study_set.all():
                 num_samples += study.sample_set.all().count()
                 num_reports += study.report_set.all().count()
-                # for sample in study.sample_set.all():
-                #     num_bnids += sample.bnid_set.all().count()
 
             project_data = {
                 'name': project.name,
