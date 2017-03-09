@@ -4,7 +4,6 @@
 var $reportTbody = $('#report-tbody');
 $(document).ready(function(){
 
-
     for (var j = 3, start = 1; start <= total_rows;j++) {
         var nextN = Math.floor(Math.log(j) * 10);
         var stop = start + nextN - 1;

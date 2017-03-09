@@ -100,22 +100,10 @@
         saveAs(new Blob([finaltsv], {type: "text/plain;charset=utf-8"}), filename);
     });
 
-    var $statusTbody = $('#status-tbody');
-    $(document).ready(function(){
-        var total_rows = {{ total_rows }};
-
-        for (var j = 3, start = 1; start <= total_rows;j++) {
-            var nextN = Math.floor(Math.log(j) * 10);
-            var stop = start + nextN - 1;
-            $.get('/viewer/status/ajax_rows/' + start + '/' + stop + '/', function(data){
-                $statusTbody.append($(data));
-            });
-            start = stop + 1;
-        }
-    });
-
 
     </script>
+    <script>var total_rows = {{ total_rows }};</script>
+    <script src="{% static 'js/status/manage_status_ajax_rows.js' %}"></script>
     <style>
     .listjs-sort-header {
         cursor: pointer;
