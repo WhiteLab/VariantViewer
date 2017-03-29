@@ -3,6 +3,7 @@
  */
 $(document).ready(function(){
     /* Set up 'add' modal box */
+
     new jBox('Modal', {
         attach: $('.igsbviewer-modal-add-button'),
         ajax: {

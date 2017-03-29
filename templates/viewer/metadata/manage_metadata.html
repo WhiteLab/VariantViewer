@@ -3,6 +3,8 @@
 {% block extra_js %}
     <script src="{% static 'js/lib/handsontable.full.min.js' %}"></script>
     <link rel="stylesheet" media="screen" href="{% static 'css/handsontable.full.css' %}">
+    <script> var new_metadata_url = "{% url 'new_metadata' %}";</script>
+    <script src="{% static 'js/metadata/manage_metadata.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -44,8 +46,7 @@
             </td>
         </tr>
         {% endfor %}
-        <script type="test/javascript"> var new_metadata_url = {% url 'new_metadata' %};</script>
-        <script src="{% static 'js/metadata/manage_metadata.js' %}"></script>
+
         </tbody>
 	</table>
 </div>
