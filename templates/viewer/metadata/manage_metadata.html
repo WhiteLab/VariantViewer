@@ -28,7 +28,7 @@
                 <th>&nbsp;</th>
 			</tr>
 		</thead>
-        <tbody>
+        <tbody class="list" id="metadata-tbody">
         {% for s in samples %}
         <tr>
             <td>{{ s.study.name }}</td>
@@ -46,7 +46,8 @@
             </td>
         </tr>
         {% endfor %}
-
+        <script>var total_rows = {{ total_rows }};</script>
+        <script src="{% static 'js/metadata/manage_metadata_ajax_rows.js' %}"></script>
         </tbody>
 	</table>
 </div>

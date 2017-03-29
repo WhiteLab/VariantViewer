@@ -1,0 +1,17 @@
+{% for s in samples %}
+<tr>
+    <td>{{ s.study.name }}</td>
+    <td class="col-xs-2">{{ s.name }}</td>
+    <td class="col-xs-2">{% for b in s.bnid_set.all %}{{ b.bnid }}<br/>{% endfor %}</td>
+    <td>{% for b in s.bnid_set.all %}{{ b.library_type }}<br/>{% endfor %}</td>
+    <td class="col-xs-3">{% for b in s.bnid_set.all %}{{b.description}}<br/>{% endfor %}</td>
+    <td>{{s.cellularity}}</td>
+    <td>{{s.creation_date}}</td>
+    <td>
+        {% if perms.viewer.delete_sample %}
+        <span class="fa fa-2x fa-pencil igsbviewer-modal-edit-button" data-pk="{{s.pk}}"></span>&nbsp;&nbsp;
+        <span class="fa fa-2x fa-trash igsbviewer-modal-delete-button" data-pk="{{s.pk}}"></span>
+        {% endif %}
+    </td>
+</tr>
+{% endfor %}

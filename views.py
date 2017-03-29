@@ -226,11 +226,27 @@ def manage_metadata(request, set_viewing_project_pk=None):
         return HttpResponseRedirect(reverse('no_project'))
     project = Project.objects.get(pk=project_pk)
     viewable_studies = request.user.userprofile.viewable_studies.all()
+    samples = Sample.objects.filter(study__project__pk=project_pk).filter(study__in=viewable_studies)
     context = {
         'project_name': project.name,
-        'samples': Sample.objects.filter(study__project__pk=project_pk).filter(study__in=viewable_studies),
+        'samples': samples[0:1],
+        'total_rows': len(samples)
     }
     return render(request, 'viewer/metadata/manage_metadata.html', context)
+
+
+@login_required
+def manage_metadata_ajax_rows(request, start, stop):
+    project_pk = filter_on_project(request.user, request.session)
+    if project_pk is None:
+        return HttpResponseRedirect(reverse('no_project'))
+    viewable_studies = request.user.userprofile.viewable_studies.all()
+    samples = Sample.objects.filter(study__project__pk=project_pk).filter(study__in=viewable_studies)[int(start):int(stop) + 1]
+    context = {'samples': samples,
+               'project_name': Project.objects.get(pk=project_pk).name,
+               }
+    context.update(csrf(request))
+    return render(request, 'viewer/metadata/manage_metadata_ajax_rows.html', context)
 
 
 @permission_required('viewer.add_sample', login_url=reverse_lazy('viewer_restricted'))
