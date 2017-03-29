@@ -262,7 +262,7 @@ def new_metadata(request):
                 new_bnid.library_type = library_type
                 new_bnid.sample = Sample.objects.get(name=sample_name)
                 new_bnid.save()
-        return HttpResponseRedirect(reverse('manage_metadata'))
+        return HttpResponseRedirect(reverse('metadata'))
     else:
         project_pk = request.session.get('viewing_project', None)
         if project_pk is None:
@@ -306,7 +306,7 @@ def edit_metadata(request, sample_id):
             if bid not in new_bids:
                 sample.bnid_set.get(bnid=bid).delete()
 
-        return HttpResponseRedirect(reverse('manage_metadata'))
+        return HttpResponseRedirect(reverse('metadata'))
     else:
         sample = Sample.objects.get(pk=sample_id)
         bids = sample.bnid_set.all()
@@ -348,7 +348,7 @@ def edit_metadata(request, sample_id):
 def delete_sample(request, sample_id):
     if request.method == 'POST':
         Sample.objects.get(pk=sample_id).delete()
-        return HttpResponseRedirect(reverse('manage_metadata'))
+        return HttpResponseRedirect(reverse('metadata'))
     else:
         sample_obj = Sample.objects.get(pk=sample_id)
         context = {'name': sample_obj.name, 'pk': sample_obj.pk}

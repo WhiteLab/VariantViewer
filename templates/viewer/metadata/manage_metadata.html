@@ -3,55 +3,6 @@
 {% block extra_js %}
     <script src="{% static 'js/lib/handsontable.full.min.js' %}"></script>
     <link rel="stylesheet" media="screen" href="{% static 'css/handsontable.full.css' %}">
-<script type="text/javascript">
-$(document).ready(function(){
-    /* Set up 'add' modal box */
-    new jBox('Modal', {
-        attach: $('.igsbviewer-modal-add-button'),
-        ajax: {
-            url: '{% url 'new_metadata' %}'
-        },
-        overlay: true,
-        closeOnClick: 'overlay',
-        closeButton: 'box'
-    });
-
-    /* Set up 'edit' and 'delete' modal boxes */
-    var pk = 0;
-    var $modalEditButton = $('.igsbviewer-modal-edit-button');
-    var $modalDeleteButton = $('.igsbviewer-modal-delete-button');
-    $modalEditButton.click(function(){
-        pk = $(this).data('pk');
-    });
-    $modalDeleteButton.click(function(){
-        pk = $(this).data('pk');
-    });
-    new jBox('Modal', {
-        onOpen: function(){
-            this.options.ajax.url = '/viewer/metadata/edit_metadata/' + pk;
-        },
-        ajax: {
-            reload: true
-        },
-        attach: $modalEditButton,
-        overlay: true,
-        closeOnClick: 'overlay',
-        closeButton: 'box'
-    });
-    new jBox('Modal', {
-        onOpen: function(){
-            this.options.ajax.url = '/viewer/sample/delete_sample/' + pk;
-        },
-        ajax: {
-            reload: true
-        },
-        attach: $modalDeleteButton,
-        overlay: true,
-        closeOnClick: 'overlay',
-        closeButton: 'box'
-    })
-});
-</script>
 {% endblock %}
 
 {% block content %}
@@ -93,6 +44,8 @@ $(document).ready(function(){
             </td>
         </tr>
         {% endfor %}
+        <script type="test/javascript"> var new_metadata_url = {% url 'new_metadata' %};</script>
+        <script src="{% static 'js/metadata/manage_metadata.js' %}"></script>
         </tbody>
 	</table>
 </div>

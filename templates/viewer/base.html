@@ -80,7 +80,7 @@
                     <li><a href="{% url 'manage_study' %}">Studies</a></li>
                     {% endif %}
                     {% if user.is_authenticated %}
-                    <li><a href="{% url 'manage_metadata' %}">Metadata</a></li>
+                    <li><a href="{% url 'metadata' %}">Metadata</a></li>
                     <li><a href="{% url 'manage_status' %}">Sample Status</a></li>
                     <li><a href="{% url 'manage_report' %}">Reports</a></li>
                     {% endif %}

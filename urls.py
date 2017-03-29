@@ -50,7 +50,7 @@ urlpatterns = patterns('',
                            name='get_samples'),
 
                        # Metadata
-                       url(r'^metadata/$', views.manage_metadata, name='manage_metadata'),
+                       url(r'^metadata/$', views.manage_metadata, name='metadata'),
                        url(r'^metadata/(?P<set_viewing_project_pk>\d+)/$', views.manage_metadata,
                            name='manage_metadata_set_viewing_project_pk'),
                        url(r'^metadata/new_metadata/$', views.new_metadata, name='new_metadata'),
