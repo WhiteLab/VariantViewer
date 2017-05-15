@@ -86,8 +86,8 @@ class Report(models.Model):
     report_file = models.FileField('Report File', upload_to='', blank=True,
                                    null=True)
 
-    def show_bnids(self, obj):
-        return "_".join([a.bnids for a in obj.bnids_set.all()])
+    def show_bnids(self):
+        return "_".join([a.bnids for a in self.bnids_set.all()])
 
     def __str__(self):
         return str(self.report_file)
