@@ -87,7 +87,7 @@ class Report(models.Model):
                                    null=True)
 
     def show_bnids(self):
-        return "_".join([a.bnids for a in self.bnids.all()])
+        return "_".join([a.bnid for a in self.bnids.all()])
 
     def __str__(self):
         return str(self.report_file)
