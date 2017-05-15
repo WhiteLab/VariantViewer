@@ -27,9 +27,6 @@ class ReportAdmin(admin.ModelAdmin):
     model = Report
     list_display = ('study', 'show_bnids', 'caller', 'report_file', 'upload_date')
 
-    def show_bnids(self, obj):
-        return "_".join([a.bnids for a in obj.bnids_set.all()])
-
 
 class StudyAdmin(admin.ModelAdmin):
     model = Study
