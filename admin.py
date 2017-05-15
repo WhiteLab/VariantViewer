@@ -35,7 +35,7 @@ class StudyAdmin(admin.ModelAdmin):
 
 class StatusAdmin(admin.ModelAdmin):
     model = Status
-    list_display = ('bnid', 'status')
+    list_display = ('study', 'bnid', 'sample', 'status')
 
 
 class GenomeAdmin(admin.ModelAdmin):
