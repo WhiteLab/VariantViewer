@@ -1,6 +1,6 @@
 from django.contrib.admin.widgets import AdminFileWidget
 from django import forms
-from models import Project, Bnid, Sample, Caller, Report, Study, SharedData, Contact
+from models import Project, Bnid, Sample, Caller, Study, SharedData, Contact
 from django.contrib.auth.models import User
 
 
@@ -41,26 +41,26 @@ class CallerForm(forms.ModelForm):
         fields = ['name']
 
 
-class ReportForm(forms.ModelForm):
-    report_file = forms.FileField(widget=AdminFileWidget, required=False)
-
-    def __init__(self, *args, **kwargs):
-        super(ReportForm, self).__init__(*args, **kwargs)
-        for field in self.fields:
-            self.fields[field].widget.attrs.update({
-                'class': 'form-control'
-            })
-        self.fields['report_file'].label = 'Report file (must be .csv or .tsv):'
-       # self.fields['bnids'] = forms.SelectMultiple()
-
-    class Meta:
-        model = Report
-        fields = ['name', 'study', 'bnids', 'genome', 'caller', 'report_file']
-        widgets = {
-            'bnids': forms.SelectMultiple(attrs={
-                'size': '10'
-            })
-        }
+# class ReportForm(forms.ModelForm):
+#     report_file = forms.FileField(widget=AdminFileWidget, required=False)
+#
+#     def __init__(self, *args, **kwargs):
+#         super(ReportForm, self).__init__(*args, **kwargs)
+#         for field in self.fields:
+#             self.fields[field].widget.attrs.update({
+#                 'class': 'form-control'
+#             })
+#         self.fields['report_file'].label = 'Report file (must be .csv or .tsv):'
+#        # self.fields['bnids'] = forms.SelectMultiple()
+#
+#     class Meta:
+#         model = Report
+#         fields = ['name', 'study', 'bnids', 'genome', 'caller', 'report_file']
+#         widgets = {
+#             'bnids': forms.SelectMultiple(attrs={
+#                 'size': '10'
+#             })
+#         }
 
 
 class StudyForm(forms.ModelForm):
