@@ -11,9 +11,8 @@ from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
 
 from forms import (ProjectForm, StudyForm,
-                   UserForm, SharedDataForm, ContactForm)
+                   UserForm, ContactForm)
 from models import *
-from util import report_parser, render_charts
 
 
 def index(request):
@@ -1018,15 +1017,15 @@ def render_gene_list(reports):
     }
 
 
-def get_series_data(request):
-    chart_name = request.GET.get('chartName')
-    kwargs = simplejson.loads(request.GET.get('chartKwargs'))
-    highchart = getattr(render_charts, chart_name)(**kwargs)
-    context = {
-        'chart_name': chart_name,
-        'highchart': highchart
-    }
-    return HttpResponse(simplejson.dumps(context))
+# def get_series_data(request):
+#     chart_name = request.GET.get('chartName')
+#     kwargs = simplejson.loads(request.GET.get('chartKwargs'))
+#     highchart = getattr(render_charts, chart_name)(**kwargs)
+#     context = {
+#         'chart_name': chart_name,
+#         'highchart': highchart
+#     }
+#     return HttpResponse(simplejson.dumps(context))
 
 
 # @user_passes_test(in_proj_user_group)
