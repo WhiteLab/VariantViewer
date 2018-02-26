@@ -918,10 +918,10 @@ def populate_sidebar(request):
         for project in current_user.project_set.all():
             num_studies = project.study_set.all().count()
             num_samples = 0
-            num_reports = 0
+            # num_reports = 0
             for study in project.study_set.all():
                 num_samples += study.sample_set.all().count()
-                num_reports += study.report_set.all().count()
+                # num_reports += study.report_set.all().count()
 
             project_data = {
                 'name': project.name,
@@ -929,7 +929,7 @@ def populate_sidebar(request):
                 'studies': num_studies,
                 'samples': num_samples,
                 # 'bnids': num_bnids,
-                'reports': num_reports,
+                # 'reports': num_reports,
                 'current': True if current_project_pk == str(project.pk) else False
             }
             nav_data.append(project_data)
@@ -944,9 +944,9 @@ def populate_sidebar(request):
 #     return render(request, 'viewer/info/info.html', {'report_pk': report_pk})
 
 
-def info_many(request):
-    report_ids = request.GET.getlist('reportIds[]')
-    return render(request, 'viewer/info/info.html', {'report_ids': simplejson.dumps(report_ids)})
+# def info_many(request):
+#     report_ids = request.GET.getlist('reportIds[]')
+#     return render(request, 'viewer/info/info.html', {'report_ids': simplejson.dumps(report_ids)})
 
 
 '''
