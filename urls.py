@@ -125,20 +125,20 @@ urlpatterns = patterns('',
                            name='get_contacts'),
 
                        # Search
-                       url(r'^search/$', views.search_reports, name='search_reports'),
-                       url(r'^search/(?P<set_viewing_project_pk>\d+)/$', views.search_reports,
-                           name='search_reports_set_viewing_project_pk'),
-                       url(r'^ajax_search_reports/(?P<search_col>\S+)/(?P<search_term>\S+)/(?P<search_type>\S+)/$',
-                           views.ajax_search_reports, name='ajax_search_reports'),
-                       url(r'^ajax_search_reports/(?P<search_col>\S+)/(?P<search_term>\S+)/(?P<search_type>\S+)/(?P<reports_ids>\S+)/$',
-                           views.ajax_search_reports, name='ajax_search_reports'),
-
-
-                       # Info
-                       url(r'^info/$', views.info_many, name='info_many'),
-                       url(r'^info/(?P<report_id>\d+)/$', views.info, name='info'),
-                       url(r'^cards/get/$', views.get_cards, name='get_cards'),
-                       # url(r'^cards/gene/(?P<report_id>\d+)/$', views.cards, name='cards_report'),
-                       url(r'^get_series_data/$', views.get_series_data, name='get_series_data')
-
+                       # url(r'^search/$', views.search_reports, name='search_reports'),
+                       # url(r'^search/(?P<set_viewing_project_pk>\d+)/$', views.search_reports,
+                       #     name='search_reports_set_viewing_project_pk'),
+                       # url(r'^ajax_search_reports/(?P<search_col>\S+)/(?P<search_term>\S+)/(?P<search_type>\S+)/$',
+                       #     views.ajax_search_reports, name='ajax_search_reports'),
+                       # url(r'^ajax_search_reports/(?P<search_col>\S+)/(?P<search_term>\S+)/(?P<search_type>\S+)/(?P<reports_ids>\S+)/$',
+                       #     views.ajax_search_reports, name='ajax_search_reports'),
+                       #
+                       #
+                       # # Info
+                       # url(r'^info/$', views.info_many, name='info_many'),
+                       # url(r'^info/(?P<report_id>\d+)/$', views.info, name='info'),
+                       # url(r'^cards/get/$', views.get_cards, name='get_cards'),
+                       # # url(r'^cards/gene/(?P<report_id>\d+)/$', views.cards, name='cards_report'),
+                       # url(r'^get_series_data/$', views.get_series_data, name='get_series_data')
+                       #
                        ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
