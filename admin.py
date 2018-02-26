@@ -23,9 +23,9 @@ class CallerAdmin(admin.ModelAdmin):
     display = ['name']
 
 
-class ReportAdmin(admin.ModelAdmin):
-    model = Report
-    list_display = ('study', 'show_bnids', 'caller', 'report_file', 'upload_date')
+# class ReportAdmin(admin.ModelAdmin):
+#     model = Report
+#     list_display = ('study', 'show_bnids', 'caller', 'report_file', 'upload_date')
 
 
 class StudyAdmin(admin.ModelAdmin):
@@ -43,11 +43,11 @@ class GenomeAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
 
 
-class VariantAdmin(admin.ModelAdmin):
-    model = Variant
-    list_display = ('__str__', 'report', 'gene_name', 'chrom', 'pos', 'ref', 'alt',
-                    'normal_ref_count', 'normal_alt_count', 'tumor_ref_count',
-                    'tumor_alt_count')
+# class VariantAdmin(admin.ModelAdmin):
+#     model = Variant
+#     list_display = ('__str__', 'report', 'gene_name', 'chrom', 'pos', 'ref', 'alt',
+#                     'normal_ref_count', 'normal_alt_count', 'tumor_ref_count',
+#                     'tumor_alt_count')
 
 
 class ContactAdmin(admin.ModelAdmin):
