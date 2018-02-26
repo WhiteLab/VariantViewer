@@ -76,52 +76,52 @@ class Bnid(models.Model):
         return '{} ({})'.format(str(self.sample), str(self.bnid))
 
 
-class Report(models.Model):
-    caller = models.ForeignKey(Caller)
-    study = models.ForeignKey(Study)
-    name = models.CharField(max_length=256, verbose_name='Report Name', default='report')
-    genome = models.ForeignKey(Genome, default=1, blank=True)
-    upload_date = models.DateTimeField('Date Uploaded', auto_now=True)
-    bnids = models.ManyToManyField(Bnid, verbose_name='Bionimbus ID', blank=True)
-    report_file = models.FileField('Report File', upload_to='', blank=True,
-                                   null=True)
+# class Report(models.Model):
+#     caller = models.ForeignKey(Caller)
+#     study = models.ForeignKey(Study)
+#     name = models.CharField(max_length=256, verbose_name='Report Name', default='report')
+#     genome = models.ForeignKey(Genome, default=1, blank=True)
+#     upload_date = models.DateTimeField('Date Uploaded', auto_now=True)
+#     bnids = models.ManyToManyField(Bnid, verbose_name='Bionimbus ID', blank=True)
+#     report_file = models.FileField('Report File', upload_to='', blank=True,
+#                                    null=True)
+#
+#     def show_bnids(self):
+#         return "_".join([a.bnid for a in self.bnids.all()])
+#
+#     def __str__(self):
+#         return str(self.report_file)
 
-    def show_bnids(self):
-        return "_".join([a.bnid for a in self.bnids.all()])
 
-    def __str__(self):
-        return str(self.report_file)
-
-
-class Variant(models.Model):
-    report = models.ForeignKey(Report)
-    chrom = models.CharField(max_length=24, verbose_name='Chrom')
-    pos = models.IntegerField(verbose_name='Position', null=True)
-    ref = models.CharField(max_length=256, verbose_name='Reference Allele',
-                           blank=True, null=True)
-    alt = models.CharField(max_length=256, verbose_name='Alternate Allele',
-                           blank=True, null=True)
-    normal_ref_count = models.IntegerField(verbose_name='Normal Ref Count',
-                                           blank=True, null=True)
-    normal_alt_count = models.IntegerField(verbose_name='Normal Alt Count',
-                                           blank=True, null=True)
-    pct_normal_alt = models.FloatField(verbose_name='%_Normal_Alt',
-                                       blank=True, null=True)
-    tumor_ref_count = models.IntegerField(verbose_name='Tumor Ref Count',
-                                          blank=True, null=True)
-    tumor_alt_count = models.IntegerField(verbose_name='Tumor Alt Count',
-                                          blank=True, null=True)
-    pct_tumor_alt = models.FloatField(verbose_name='%_Tumor_Alt',
-                                      blank=True, null=True)
-    tn_pct_alt_ratio = models.FloatField(verbose_name='T/N % alt ratio',
-                                         blank=True, null=True)
-    gene_name = models.CharField(max_length=32, verbose_name='Gene Name',
-                                 blank=True, null=True)
-    extra_info = models.CharField(verbose_name='Extra Info', blank=True,
-                                  null=True, max_length=20000)
-
-    def __str__(self):
-        return "{}:{}{}>{}".format(self.chrom, self.pos, self.ref, self.alt)
+# class Variant(models.Model):
+#     report = models.ForeignKey(Report)
+#     chrom = models.CharField(max_length=24, verbose_name='Chrom')
+#     pos = models.IntegerField(verbose_name='Position', null=True)
+#     ref = models.CharField(max_length=256, verbose_name='Reference Allele',
+#                            blank=True, null=True)
+#     alt = models.CharField(max_length=256, verbose_name='Alternate Allele',
+#                            blank=True, null=True)
+#     normal_ref_count = models.IntegerField(verbose_name='Normal Ref Count',
+#                                            blank=True, null=True)
+#     normal_alt_count = models.IntegerField(verbose_name='Normal Alt Count',
+#                                            blank=True, null=True)
+#     pct_normal_alt = models.FloatField(verbose_name='%_Normal_Alt',
+#                                        blank=True, null=True)
+#     tumor_ref_count = models.IntegerField(verbose_name='Tumor Ref Count',
+#                                           blank=True, null=True)
+#     tumor_alt_count = models.IntegerField(verbose_name='Tumor Alt Count',
+#                                           blank=True, null=True)
+#     pct_tumor_alt = models.FloatField(verbose_name='%_Tumor_Alt',
+#                                       blank=True, null=True)
+#     tn_pct_alt_ratio = models.FloatField(verbose_name='T/N % alt ratio',
+#                                          blank=True, null=True)
+#     gene_name = models.CharField(max_length=32, verbose_name='Gene Name',
+#                                  blank=True, null=True)
+#     extra_info = models.CharField(verbose_name='Extra Info', blank=True,
+#                                   null=True, max_length=20000)
+#
+#     def __str__(self):
+#         return "{}:{}{}>{}".format(self.chrom, self.pos, self.ref, self.alt)
 
 
 class Contact(models.Model):
