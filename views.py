@@ -10,7 +10,7 @@ from django.shortcuts import render, render_to_response
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
 
-from forms import (ProjectForm, ReportForm, StudyForm,
+from forms import (ProjectForm, StudyForm,
                    UserForm, SharedDataForm, ContactForm)
 from models import *
 from util import report_parser, render_charts
@@ -450,188 +450,188 @@ Report model
 '''
 
 
-@login_required
-def manage_report(request, set_viewing_project_pk=None):
-    project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
-    if project_pk is None:
-        return HttpResponseRedirect(reverse('no_project'))
-    viewable_studies = request.user.userprofile.viewable_studies.all()
-    reports = Report.objects.filter(study__project__pk=project_pk).filter(study__in=viewable_studies)
-    context = {
-        'reports': reports[0:1],
-        'total_rows': len(reports),
-        'project_name': Project.objects.get(pk=project_pk).name,
-        'variant_fields': Variant._meta.get_all_field_names()
-    }
-    context.update(csrf(request))
-    return render(request, 'viewer/report/manage_report.html', context)
-
-
-@login_required
-def manage_report_ajax_rows(request, start, stop):
-    project_pk = filter_on_project(request.user, request.session)
-    if project_pk is None:
-        return HttpResponseRedirect(reverse('no_project'))
-    viewable_studies = request.user.userprofile.viewable_studies.all()
-    reports = Report.objects.filter(study__project__pk=project_pk, study__in=viewable_studies)[int(start):int(stop) + 1]
-    context = {'reports': reports,
-               'project_name': Project.objects.get(pk=project_pk).name,
-               'variant_fields': Variant._meta.get_all_field_names()
-               }
-    context.update(csrf(request))
-    return render(request, 'viewer/report/manage_report_ajax_rows.html', context)
-
-
-@permission_required('viewer.add_report', login_url=reverse_lazy('viewer_restricted'))
-def upload_report(request):
-    if request.method == 'POST':
-        if request.FILES:
-            rform = ReportForm(request.POST, request.FILES)
-        else:
-            rform = ReportForm(request.POST)
-        if rform.is_valid():
-            report = rform.save()
-            report_parser.load_into_db(report)
-            return HttpResponseRedirect(reverse('manage_report'))
-        else:
-            print "rform (ReportForm) is Invalid"
-            print str(rform)
-    else:
-        project_pk = request.session.get('viewing_project', None)
-        if project_pk is None:
-            return HttpResponseRedirect(reverse('no_project'))
-        project = Project.objects.get(pk=project_pk)
-        rform = ReportForm(instance=Report(), initial={})
-        rform.fields['study'].queryset = project.study_set.all()
-        context = {'report_form': rform}
-        context.update(csrf(request))
-        return render_to_response('viewer/report/upload_report.html', context,
-                                  context_instance=RequestContext(request))
-
-
-@permission_required('viewer.change_report', login_url=reverse_lazy('viewer_restricted'))
-def edit_report(request, report_id):
-    if request.method == 'POST':
-        r = Report.objects.get(pk=report_id)
-        if request.FILES:
-            updated_form = ReportForm(request.POST, request.FILES, instance=r)
-            r.variant_set.all().delete()
-        else:
-            updated_form = ReportForm(request.POST, instance=r)
-        if updated_form.is_valid():
-            updated_form.save()
-            report_parser.load_into_db(r)
-            return HttpResponseRedirect(reverse('manage_report'))
-    else:
-        project_pk = request.session.get('viewing_project', None)
-        if project_pk is None:
-            return HttpResponseRedirect(reverse('no_project'))
-        project = Project.objects.get(pk=project_pk)
-        report_obj = Report.objects.get(pk=report_id)
-        rform = ReportForm(instance=report_obj)
-        rform.fields['study'].queryset = project.study_set.all()
-        context = {'report_form': rform,
-                   'report': report_obj.report_file,
-                   'pk': report_id,}
-        context.update(csrf(request))
-        return render_to_response('viewer/report/edit_report.html', context,
-                                  context_instance=RequestContext(request))
-
-
-def reports_summary(variants):
-    impact_dict = {'all': {}, 'conf': {}}
-    effect_dict = {'all': {}, 'conf': {}}
-    strong = {'HIGH': 1, 'MODERATE': 1}
-    for var in variants:
-        ext = dict([e.split('=') for e in var.extra_info.split(';')])
-        if ext['on/off-target'] == 'ON':
-            (impact, effect) = (ext['impact'], ext['effect'])
-            effect = effect.replace('&', '<br>')
-            effect = effect.replace('_', ' ')
-            if impact not in impact_dict['all']:
-                impact_dict['all'][impact] = 0
-            impact_dict['all'][impact] += 1
-            if effect not in effect_dict['all']:
-                effect_dict['all'][effect] = 0
-            effect_dict['all'][effect] += 1
-            if impact in strong and var.pct_tumor_alt >= 5 and ('exac_maf' not in ext or float(ext['exac_maf']) <= 0.01
-            and var.tn_pct_alt_ratio >= 2):
-                if impact not in impact_dict['conf']:
-                    impact_dict['conf'][impact] = 0
-                impact_dict['conf'][impact] += 1
-                if effect not in effect_dict['conf']:
-                    effect_dict['conf'][effect] = 0
-                effect_dict['conf'][effect] += 1
-    return impact_dict, effect_dict
-
-
-@login_required
-def view_report(request, file_id):
-    # build context from file
-    report_obj = Report.objects.get(pk=file_id)
-
-    # Ajaxy version to grab variants from db
-    variants = report_obj.variant_set.all()
-
-    (impact_dict, effect_dict) = reports_summary(variants)
-
-    # print report_data
-    report_html = str(report_parser.json_from_ajax(variants))
-
-    # add table class and id
-    replace_string = "<table class=\"table table-hover\" id=\"report-table\">"
-    report_html = report_html.replace("<table>", replace_string)
-
-    context = {'report_html': report_html,
-               'viewing_report': True,
-               'filename': report_obj.report_file.name.split('/')[1],
-               'study': report_obj.bnids.first().sample.study,
-               'report_obj': report_obj, 'impact_json': simplejson.dumps(impact_dict),
-               'effect_json': simplejson.dumps(effect_dict)}
-    return render(request, 'viewer/report/view_report.html', context)
-
-
-# get info to upload reports
-@csrf_exempt
-def report_info_get(request):
-    try:
-        info_req = simplejson.loads(request.readlines()[0])
-        (bid, caller_name, genome_name) = (
-            info_req['bid'], info_req['caller'], info_req['genome'])
-        report_info = Bnid.objects.get(bnid=bid)
-        caller_info = Caller.objects.get(name=caller_name)
-        genome_info = Genome.objects.get(name=genome_name)
-
-        bid_pk = report_info.pk
-        sample = report_info.sample.name
-        study = report_info.sample.study.pk
-        description = report_info.sample.description
-        caller_pk = caller_info.pk
-        genome_pk = genome_info.pk
-
-        json_response = {'bid_pk': bid_pk,
-                         'sample': sample,
-                         'study': study,
-                         'description': description,
-                         'caller_pk': caller_pk,
-                         'genome_pk': genome_pk}
-
-        pretty = simplejson.dumps(json_response, sort_keys=True, indent=4)
-        return HttpResponse(pretty)
-    except Exception as e:
-        error = {'Message': e.message}
-        return HttpResponse(error)
-
-
-@permission_required('viewer.delete_report', login_url=reverse_lazy('viewer_restricted'))
-def delete_report(request, report_id):
-    if request.method == 'POST':
-        Report.objects.get(pk=report_id).delete()
-        return HttpResponseRedirect(reverse('manage_report'))
-    else:
-        report_obj = Report.objects.get(pk=report_id)
-        context = {'name': report_obj.report_file.name.strip('./'), 'pk': report_obj.pk}
-        return render(request, 'viewer/report/delete_report.html', context)
+# @login_required
+# def manage_report(request, set_viewing_project_pk=None):
+#     project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
+#     if project_pk is None:
+#         return HttpResponseRedirect(reverse('no_project'))
+#     viewable_studies = request.user.userprofile.viewable_studies.all()
+#     reports = Report.objects.filter(study__project__pk=project_pk).filter(study__in=viewable_studies)
+#     context = {
+#         'reports': reports[0:1],
+#         'total_rows': len(reports),
+#         'project_name': Project.objects.get(pk=project_pk).name,
+#         'variant_fields': Variant._meta.get_all_field_names()
+#     }
+#     context.update(csrf(request))
+#     return render(request, 'viewer/report/manage_report.html', context)
+#
+#
+# @login_required
+# def manage_report_ajax_rows(request, start, stop):
+#     project_pk = filter_on_project(request.user, request.session)
+#     if project_pk is None:
+#         return HttpResponseRedirect(reverse('no_project'))
+#     viewable_studies = request.user.userprofile.viewable_studies.all()
+#     reports = Report.objects.filter(study__project__pk=project_pk, study__in=viewable_studies)[int(start):int(stop) + 1]
+#     context = {'reports': reports,
+#                'project_name': Project.objects.get(pk=project_pk).name,
+#                'variant_fields': Variant._meta.get_all_field_names()
+#                }
+#     context.update(csrf(request))
+#     return render(request, 'viewer/report/manage_report_ajax_rows.html', context)
+#
+#
+# @permission_required('viewer.add_report', login_url=reverse_lazy('viewer_restricted'))
+# def upload_report(request):
+#     if request.method == 'POST':
+#         if request.FILES:
+#             rform = ReportForm(request.POST, request.FILES)
+#         else:
+#             rform = ReportForm(request.POST)
+#         if rform.is_valid():
+#             report = rform.save()
+#             report_parser.load_into_db(report)
+#             return HttpResponseRedirect(reverse('manage_report'))
+#         else:
+#             print "rform (ReportForm) is Invalid"
+#             print str(rform)
+#     else:
+#         project_pk = request.session.get('viewing_project', None)
+#         if project_pk is None:
+#             return HttpResponseRedirect(reverse('no_project'))
+#         project = Project.objects.get(pk=project_pk)
+#         rform = ReportForm(instance=Report(), initial={})
+#         rform.fields['study'].queryset = project.study_set.all()
+#         context = {'report_form': rform}
+#         context.update(csrf(request))
+#         return render_to_response('viewer/report/upload_report.html', context,
+#                                   context_instance=RequestContext(request))
+#
+#
+# @permission_required('viewer.change_report', login_url=reverse_lazy('viewer_restricted'))
+# def edit_report(request, report_id):
+#     if request.method == 'POST':
+#         r = Report.objects.get(pk=report_id)
+#         if request.FILES:
+#             updated_form = ReportForm(request.POST, request.FILES, instance=r)
+#             r.variant_set.all().delete()
+#         else:
+#             updated_form = ReportForm(request.POST, instance=r)
+#         if updated_form.is_valid():
+#             updated_form.save()
+#             report_parser.load_into_db(r)
+#             return HttpResponseRedirect(reverse('manage_report'))
+#     else:
+#         project_pk = request.session.get('viewing_project', None)
+#         if project_pk is None:
+#             return HttpResponseRedirect(reverse('no_project'))
+#         project = Project.objects.get(pk=project_pk)
+#         report_obj = Report.objects.get(pk=report_id)
+#         rform = ReportForm(instance=report_obj)
+#         rform.fields['study'].queryset = project.study_set.all()
+#         context = {'report_form': rform,
+#                    'report': report_obj.report_file,
+#                    'pk': report_id,}
+#         context.update(csrf(request))
+#         return render_to_response('viewer/report/edit_report.html', context,
+#                                   context_instance=RequestContext(request))
+#
+#
+# def reports_summary(variants):
+#     impact_dict = {'all': {}, 'conf': {}}
+#     effect_dict = {'all': {}, 'conf': {}}
+#     strong = {'HIGH': 1, 'MODERATE': 1}
+#     for var in variants:
+#         ext = dict([e.split('=') for e in var.extra_info.split(';')])
+#         if ext['on/off-target'] == 'ON':
+#             (impact, effect) = (ext['impact'], ext['effect'])
+#             effect = effect.replace('&', '<br>')
+#             effect = effect.replace('_', ' ')
+#             if impact not in impact_dict['all']:
+#                 impact_dict['all'][impact] = 0
+#             impact_dict['all'][impact] += 1
+#             if effect not in effect_dict['all']:
+#                 effect_dict['all'][effect] = 0
+#             effect_dict['all'][effect] += 1
+#             if impact in strong and var.pct_tumor_alt >= 5 and ('exac_maf' not in ext or float(ext['exac_maf']) <= 0.01
+#             and var.tn_pct_alt_ratio >= 2):
+#                 if impact not in impact_dict['conf']:
+#                     impact_dict['conf'][impact] = 0
+#                 impact_dict['conf'][impact] += 1
+#                 if effect not in effect_dict['conf']:
+#                     effect_dict['conf'][effect] = 0
+#                 effect_dict['conf'][effect] += 1
+#     return impact_dict, effect_dict
+#
+#
+# @login_required
+# def view_report(request, file_id):
+#     # build context from file
+#     report_obj = Report.objects.get(pk=file_id)
+#
+#     # Ajaxy version to grab variants from db
+#     variants = report_obj.variant_set.all()
+#
+#     (impact_dict, effect_dict) = reports_summary(variants)
+#
+#     # print report_data
+#     report_html = str(report_parser.json_from_ajax(variants))
+#
+#     # add table class and id
+#     replace_string = "<table class=\"table table-hover\" id=\"report-table\">"
+#     report_html = report_html.replace("<table>", replace_string)
+#
+#     context = {'report_html': report_html,
+#                'viewing_report': True,
+#                'filename': report_obj.report_file.name.split('/')[1],
+#                'study': report_obj.bnids.first().sample.study,
+#                'report_obj': report_obj, 'impact_json': simplejson.dumps(impact_dict),
+#                'effect_json': simplejson.dumps(effect_dict)}
+#     return render(request, 'viewer/report/view_report.html', context)
+#
+#
+# # get info to upload reports
+# @csrf_exempt
+# def report_info_get(request):
+#     try:
+#         info_req = simplejson.loads(request.readlines()[0])
+#         (bid, caller_name, genome_name) = (
+#             info_req['bid'], info_req['caller'], info_req['genome'])
+#         report_info = Bnid.objects.get(bnid=bid)
+#         caller_info = Caller.objects.get(name=caller_name)
+#         genome_info = Genome.objects.get(name=genome_name)
+#
+#         bid_pk = report_info.pk
+#         sample = report_info.sample.name
+#         study = report_info.sample.study.pk
+#         description = report_info.sample.description
+#         caller_pk = caller_info.pk
+#         genome_pk = genome_info.pk
+#
+#         json_response = {'bid_pk': bid_pk,
+#                          'sample': sample,
+#                          'study': study,
+#                          'description': description,
+#                          'caller_pk': caller_pk,
+#                          'genome_pk': genome_pk}
+#
+#         pretty = simplejson.dumps(json_response, sort_keys=True, indent=4)
+#         return HttpResponse(pretty)
+#     except Exception as e:
+#         error = {'Message': e.message}
+#         return HttpResponse(error)
+#
+#
+# @permission_required('viewer.delete_report', login_url=reverse_lazy('viewer_restricted'))
+# def delete_report(request, report_id):
+#     if request.method == 'POST':
+#         Report.objects.get(pk=report_id).delete()
+#         return HttpResponseRedirect(reverse('manage_report'))
+#     else:
+#         report_obj = Report.objects.get(pk=report_id)
+#         context = {'name': report_obj.report_file.name.strip('./'), 'pk': report_obj.pk}
+#         return render(request, 'viewer/report/delete_report.html', context)
 
 
 '''
@@ -749,36 +749,36 @@ Search functions
 '''
 
 
-@login_required
-def search_reports(request, set_viewing_project_pk=None):
-    project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
-    if project_pk is None:
-        return HttpResponseRedirect(reverse('no_project'))
-    variant_fields = Variant._meta.get_all_field_names()
-    num_reports = len(
-        list(set(Variant.objects.values_list('report', flat=True).filter(report__study__project__pk=project_pk))))
-    context = {
-        'variant_fields': variant_fields,
-        'num_reports': num_reports,
-        'project_name': Project.objects.get(pk=project_pk).name
-    }
-    return render(request, 'viewer/search/search_reports.html', context)
-
-
-@login_required
-@csrf_exempt
-def ajax_search_reports(request, search_col, search_term, search_type):
-    project_pk = request.session.get('viewing_project', None)
-    if project_pk is None:
-        return HttpResponseRedirect(reverse('no_project'))
-    db_lookup = '__'.join([search_col, search_type])
-    variants = Variant.objects.all()
-    if request.POST.get('report_ids'):
-        report_ids = simplejson.loads(request.POST.get('report_ids'))
-        variants = variants.filter(report_id__in=report_ids)
-    variants = (variants.filter(report__study__project__pk=project_pk)
-                .filter(**{db_lookup: search_term}))
-    return HttpResponse(report_parser.json_from_ajax(variants))
+# @login_required
+# def search_reports(request, set_viewing_project_pk=None):
+#     project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
+#     if project_pk is None:
+#         return HttpResponseRedirect(reverse('no_project'))
+#     variant_fields = Variant._meta.get_all_field_names()
+#     num_reports = len(
+#         list(set(Variant.objects.values_list('report', flat=True).filter(report__study__project__pk=project_pk))))
+#     context = {
+#         'variant_fields': variant_fields,
+#         'num_reports': num_reports,
+#         'project_name': Project.objects.get(pk=project_pk).name
+#     }
+#     return render(request, 'viewer/search/search_reports.html', context)
+#
+#
+# @login_required
+# @csrf_exempt
+# def ajax_search_reports(request, search_col, search_term, search_type):
+#     project_pk = request.session.get('viewing_project', None)
+#     if project_pk is None:
+#         return HttpResponseRedirect(reverse('no_project'))
+#     db_lookup = '__'.join([search_col, search_type])
+#     variants = Variant.objects.all()
+#     if request.POST.get('report_ids'):
+#         report_ids = simplejson.loads(request.POST.get('report_ids'))
+#         variants = variants.filter(report_id__in=report_ids)
+#     variants = (variants.filter(report__study__project__pk=project_pk)
+#                 .filter(**{db_lookup: search_term}))
+#     return HttpResponse(report_parser.json_from_ajax(variants))
 
 
 '''
@@ -786,51 +786,51 @@ Shared Reports
 '''
 
 
-def view_shared_data(request, shared_data_uuid):
-    shared_report = SharedData.objects.filter(uuid__iexact=shared_data_uuid)
-    if len(shared_report) == 0:
-        return HttpResponse(reverse('shared_data_dne'))
-    shared_report = shared_report[0]
-    if shared_report.inactive_date < datetime.date.today():
-        return HttpResponse(reverse('shared_data_expired'))
-
-    field_lookup = simplejson.loads(shared_report.field_lookup)
-    variants = Variant.objects.filter(**field_lookup)
-
-    report_html = str(report_parser.json_from_ajax(variants))
-
-    replace_string = "<table class=\"table table-hover\" id=\"report-table\">"
-    report_html = report_html.replace("<table>", replace_string)
-
-    context = {'report_html': report_html,
-               'viewing_report': False,
-               'shared_data_name': shared_report.name}
-    return render(request, 'viewer/report/view_report.html', context)
-
-
-def view_share_data_expired(request):
-    return render(request, 'viewer/error/share_data_expired.html')
-
-
-def view_share_data_dne(request):
-    return render(request, 'viewer/error/share_data_dne.html')
-
-
-def share_search(request):
-    if request.method == 'POST':
-        shared_data_form = SharedDataForm(request.POST, instance=SharedData())
-    else:
-        shared_data_form = SharedDataForm(instance=SharedData(), initial={
-            'field_lookup': ''
-        })
-
-
-def new_shared_data(request):
-    if request.method == 'POST':
-        shared_data_form = SharedDataForm(request.POST, instance=SharedData())
-        if shared_data_form.is_valid():
-            shared_data_form.save()
-        return HttpResponseRedirect
+# def view_shared_data(request, shared_data_uuid):
+#     shared_report = SharedData.objects.filter(uuid__iexact=shared_data_uuid)
+#     if len(shared_report) == 0:
+#         return HttpResponse(reverse('shared_data_dne'))
+#     shared_report = shared_report[0]
+#     if shared_report.inactive_date < datetime.date.today():
+#         return HttpResponse(reverse('shared_data_expired'))
+#
+#     field_lookup = simplejson.loads(shared_report.field_lookup)
+#     variants = Variant.objects.filter(**field_lookup)
+#
+#     report_html = str(report_parser.json_from_ajax(variants))
+#
+#     replace_string = "<table class=\"table table-hover\" id=\"report-table\">"
+#     report_html = report_html.replace("<table>", replace_string)
+#
+#     context = {'report_html': report_html,
+#                'viewing_report': False,
+#                'shared_data_name': shared_report.name}
+#     return render(request, 'viewer/report/view_report.html', context)
+#
+#
+# def view_share_data_expired(request):
+#     return render(request, 'viewer/error/share_data_expired.html')
+#
+#
+# def view_share_data_dne(request):
+#     return render(request, 'viewer/error/share_data_dne.html')
+#
+#
+# def share_search(request):
+#     if request.method == 'POST':
+#         shared_data_form = SharedDataForm(request.POST, instance=SharedData())
+#     else:
+#         shared_data_form = SharedDataForm(instance=SharedData(), initial={
+#             'field_lookup': ''
+#         })
+#
+#
+# def new_shared_data(request):
+#     if request.method == 'POST':
+#         shared_data_form = SharedDataForm(request.POST, instance=SharedData())
+#         if shared_data_form.is_valid():
+#             shared_data_form.save()
+#         return HttpResponseRedirect
 
 
 '''
@@ -887,11 +887,11 @@ def get_studies(request):
         print e.message
         return HttpResponse(simplejson.dumps(error))
 
-@login_required
-def load_variants(request, report_id=None):
-    report_obj = Report.objects.get(pk=report_id)
-    report_parser.load_into_db(report_obj)
-    return HttpResponseRedirect(reverse('manage_report'))
+# @login_required
+# def load_variants(request, report_id=None):
+#     report_obj = Report.objects.get(pk=report_id)
+#     report_parser.load_into_db(report_obj)
+#     return HttpResponseRedirect(reverse('manage_report'))
 
 
 @login_required
@@ -940,9 +940,9 @@ def populate_sidebar(request):
     return HttpResponse('')
 
 
-def info(request, report_id):
-    report_pk = Report.objects.get(pk=report_id).pk
-    return render(request, 'viewer/info/info.html', {'report_pk': report_pk})
+# def info(request, report_id):
+#     report_pk = Report.objects.get(pk=report_id).pk
+#     return render(request, 'viewer/info/info.html', {'report_pk': report_pk})
 
 
 def info_many(request):
@@ -955,22 +955,22 @@ Cards functions
 '''
 
 
-def get_cards(request):
-    context = {}
-    card_names = request.GET.getlist('cards[]')
-    report_ids = request.GET.getlist('report_ids[]')
-    reports = Report.objects.filter(pk__in=report_ids)
-    context.update({
-        'reports': reports,
-        'report_ids_json': simplejson.dumps(report_ids),
-        'reports_list_string': ', '.join([report.name for report in reports]),
-        'cards': card_names
-    })
-    if 'geneList' in card_names:
-        context.update(render_gene_list(reports))
-    if 'geneProfile' in card_names:
-        context.update(render_gene_profile(reports, request.GET.get('gene_name')))
-    return render(request, 'viewer/cards/cards.html', context)
+# def get_cards(request):
+#     context = {}
+#     card_names = request.GET.getlist('cards[]')
+#     report_ids = request.GET.getlist('report_ids[]')
+#     reports = Report.objects.filter(pk__in=report_ids)
+#     context.update({
+#         'reports': reports,
+#         'report_ids_json': simplejson.dumps(report_ids),
+#         'reports_list_string': ', '.join([report.name for report in reports]),
+#         'cards': card_names
+#     })
+#     if 'geneList' in card_names:
+#         context.update(render_gene_list(reports))
+#     if 'geneProfile' in card_names:
+#         context.update(render_gene_profile(reports, request.GET.get('gene_name')))
+#     return render(request, 'viewer/cards/cards.html', context)
 
 
 def render_gene_profile(reports, gene_name):
@@ -1030,62 +1030,62 @@ def get_series_data(request):
 
 
 # @user_passes_test(in_proj_user_group)
-def share_report(request):
-    if request.method == 'POST':
-        shared_data_form = SharedDataForm(request.POST, instance=SharedData())
-        if shared_data_form.is_valid():
-            shared_data = shared_data_form.save(commit=False)
-            shared_data.user = request.user
-            shared_data.creation_date = datetime.date.today()
-            shared_data.save()
-            shared_data_form.save_m2m()
-            # format the email better here TODO
-            subject = 'Shared Variant Report: {}'.format(
-                shared_data_form['name'].value())
-            absolute_uri = request.build_absolute_uri('/')
-            uuid = str(shared_data.uuid).replace('-', '')
-            share_url = absolute_uri + 'viewer/shared/view/' + uuid + '/'
-            recipients = [str(contact) for contact in shared_data.shared_recipient.all()]
-
-            message = 'A variant report has been shared with you. Go to the following link to view: '
-            message += share_url
-
-            # send_mail(subject, message, 'no-reply@uchicago.edu',
-            #           recipients, fail_silently=False)
-
-        return HttpResponseRedirect(reverse('manage_report'))
-        # I don't know that we should necessarily redirect
-        # Maybe just close the modal box, return to page?
-        # but then how do we assure success? Or report failure? TODO
-    else:
-        project_pk = request.session.get('viewing_project', None)
-        if project_pk is None:
-            return HttpResponseRedirect(reverse('no_project'))
-        report_ids = request.GET.getlist('reportid')
-        reports = Report.objects.filter(pk__in=report_ids)
-        shared_data_form = SharedDataForm(instance=SharedData(), initial={
-            'field_lookup': simplejson.dumps({'report_id__in': report_ids})
-        })
-        shared_data_form.fields['shared_recipient'].queryset = Project.objects.get(pk=project_pk).contact_set.all()
-        context = {
-            'reports_name': ', '.join([report.name for report in reports]),
-            'shared_data_form': shared_data_form
-        }
-        return render(request, 'viewer/share/share_report.html', context)
-
-
-def zip_and_download(request):
-    import zipfile
-    now = datetime.datetime.now()
-    zipped_name = 'VariantViewerReports_' + ''.join(map(str, [now.year, now.month, now.day, '_', now.hour,
-                                                              now.minute, now.second]))
-    zipped_reports = zipfile.ZipFile('viewer/files/' + zipped_name + '.zip', mode='w')
-
-    report_ids = request.GET.getlist('reportids[]')
-    report_files = [report.report_file.name for report in Report.objects.filter(pk__in=report_ids)]
-    try:
-        for report_file in report_files:
-            zipped_reports.write('viewer/files/' + report_file, report_file)
-    finally:
-        zipped_reports.close()
-    return HttpResponse('/viewer/files/' + zipped_name + '.zip')
+# def share_report(request):
+#     if request.method == 'POST':
+#         shared_data_form = SharedDataForm(request.POST, instance=SharedData())
+#         if shared_data_form.is_valid():
+#             shared_data = shared_data_form.save(commit=False)
+#             shared_data.user = request.user
+#             shared_data.creation_date = datetime.date.today()
+#             shared_data.save()
+#             shared_data_form.save_m2m()
+#             # format the email better here TODO
+#             subject = 'Shared Variant Report: {}'.format(
+#                 shared_data_form['name'].value())
+#             absolute_uri = request.build_absolute_uri('/')
+#             uuid = str(shared_data.uuid).replace('-', '')
+#             share_url = absolute_uri + 'viewer/shared/view/' + uuid + '/'
+#             recipients = [str(contact) for contact in shared_data.shared_recipient.all()]
+#
+#             message = 'A variant report has been shared with you. Go to the following link to view: '
+#             message += share_url
+#
+#             # send_mail(subject, message, 'no-reply@uchicago.edu',
+#             #           recipients, fail_silently=False)
+#
+#         return HttpResponseRedirect(reverse('manage_report'))
+#         # I don't know that we should necessarily redirect
+#         # Maybe just close the modal box, return to page?
+#         # but then how do we assure success? Or report failure? TODO
+#     else:
+#         project_pk = request.session.get('viewing_project', None)
+#         if project_pk is None:
+#             return HttpResponseRedirect(reverse('no_project'))
+#         report_ids = request.GET.getlist('reportid')
+#         reports = Report.objects.filter(pk__in=report_ids)
+#         shared_data_form = SharedDataForm(instance=SharedData(), initial={
+#             'field_lookup': simplejson.dumps({'report_id__in': report_ids})
+#         })
+#         shared_data_form.fields['shared_recipient'].queryset = Project.objects.get(pk=project_pk).contact_set.all()
+#         context = {
+#             'reports_name': ', '.join([report.name for report in reports]),
+#             'shared_data_form': shared_data_form
+#         }
+#         return render(request, 'viewer/share/share_report.html', context)
+#
+#
+# def zip_and_download(request):
+#     import zipfile
+#     now = datetime.datetime.now()
+#     zipped_name = 'VariantViewerReports_' + ''.join(map(str, [now.year, now.month, now.day, '_', now.hour,
+#                                                               now.minute, now.second]))
+#     zipped_reports = zipfile.ZipFile('viewer/files/' + zipped_name + '.zip', mode='w')
+#
+#     report_ids = request.GET.getlist('reportids[]')
+#     report_files = [report.report_file.name for report in Report.objects.filter(pk__in=report_ids)]
+#     try:
+#         for report_file in report_files:
+#             zipped_reports.write('viewer/files/' + report_file, report_file)
+#     finally:
+#         zipped_reports.close()
+#     return HttpResponse('/viewer/files/' + zipped_name + '.zip')
