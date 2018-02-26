@@ -10,17 +10,14 @@ body{
 </style>
 <div class="container">
     <div class="row viewer-box" style="margin-top:100px">
-        <h1 style="margin-top:0;text-align:center">Variant Report Viewer</h1>
+        <h1 style="margin-top:0;text-align:center">Chicago Pancreatic Cancer Initiative (CPCI) LIMS</h1>
         {% if user.is_authenticated %}
         <p>Hello, {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}!</p>
         {% endif %}
         <p>
-		The purpose of this tool is to provide a way to store, organize, view, and
-		eventually search Variant data from user-uploaded files.  Each Study
-		(e.g. a single patient, VIP, etc.) can contain many Samples.  Each of these
-		samples may be represented by one or many NGS libraries identified by Bionimbus
-		IDs.  The Variant Report resulting from the comparison of 2 Bionimbus IDs,
-		such as a Tumor/Normal pair, can be loaded into this service.
+		The purpose of this site is to act as a LIMS for NGS sequencing related to the CPCI. Studies and and related
+            sample QC can be found here. Variant calls and expression-level details can be found on our local
+            implementation of MSKCCs cbioportal.
 	    </p>
 	    <p style="text-align:center;margin-top:50px">
             {% if not user.is_authenticated %}
