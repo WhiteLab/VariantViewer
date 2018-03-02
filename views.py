@@ -1,4 +1,5 @@
 import simplejson
+import os
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import permission_required, login_required
@@ -374,6 +375,20 @@ def manage_status(request, set_viewing_project_pk=None):
         'total_rows': len(statuses)
     }
     return render(request, 'viewer/status/manage_status.html', context)
+
+
+@login_required
+def get_stats(request, dname, bnid, set_viewing_project_pk=None):
+    project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
+    if project_pk is None:
+        return HttpResponseRedirect(reverse('no_project'))
+    stat_req = settings.MEDIA_ROOT + dname + '/' + bnid + '/QC/'
+    flist = os.listdir(stat_req)
+    links = ''
+    for fn in flist:
+        if fn[-5:] == '.html' or fn[-5:] == '.json':
+            links += '<a href="' + stat_req + fn + '">' + fn + '</a>'
+    return HttpResponse(links)
 
 
 @login_required
