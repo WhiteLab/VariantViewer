@@ -36,18 +36,18 @@
             <td class="bnid-library-type">{{ s.bnid.library_type}}</td>
             <td class="submit-date">{{ s.submit_date }}</td>
             <td class="sequence-date">
-                {%if s.status != 'Sample submitted for sequencing' and s.status != 'SEQUENCED' and s.status != 'FAILED QNS'%}
-                    <a href="{%  url 'get_stats' 'FASTQC' s.bnid.bnid  %}" >{{ s.sequence_date }}</a>
-                {% else %}
+{#                {%if s.status != 'Sample submitted for sequencing' and s.status != 'SEQUENCED' and s.status != 'FAILED QNS'%}#}
+{#                    <a href="{%  url 'get_stats' 'FASTQC' s.bnid.bnid  %}" >{{ s.sequence_date }}</a>#}
+{#                {% else %}#}
                     <span>{{ s.sequence_date }}</span>
-                {%endif%}
+{#                {%endif%}#}
             </td>
             <td class="align-date">
-                {%if s.status != 'Sample submitted for sequencing' and s.status != 'SEQUENCED' and s.status != 'FAILED QNS'%}
-                    <a href="{%  url 'get_stats' 'ALIGN' s.bnid.bnid  %}" >{{ s.sequence_date }}</a>
-                {% else %}
+{#                {%if s.status != 'Sample submitted for sequencing' and s.status != 'SEQUENCED' and s.status != 'FAILED QNS'%}#}
+{#                    <a href="{%  url 'get_stats' 'ALIGN' s.bnid.bnid  %}" >{{ s.sequence_date }}</a>#}
+{#                {% else %}#}
                     <span>{{ s.align_date }}</span>
-                {%endif%}
+{#                {%endif%}#}
             </td>
             <td class="analysis-date">{{ s.analysis_date }}</td>
             <td class="status">{{ s.status }}</td>
