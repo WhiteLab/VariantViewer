@@ -378,10 +378,10 @@ def manage_status(request, set_viewing_project_pk=None):
 
 
 @login_required
-def get_stats(request, dname, bnid, set_viewing_project_pk=None):
-    project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
-    if project_pk is None:
-        return HttpResponseRedirect(reverse('no_project'))
+def get_stats(request, dname, bnid):
+    # project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
+    # if project_pk is None:
+    #    return HttpResponseRedirect(reverse('no_project'))
     stat_req = settings.MEDIA_ROOT + dname + '/' + bnid + '/QC/'
     flist = os.listdir(stat_req)
     links = ''
