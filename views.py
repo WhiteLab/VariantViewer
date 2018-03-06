@@ -382,6 +382,9 @@ def get_stats(request, dname, bnid):
     # project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
     # if project_pk is None:
     #    return HttpResponseRedirect(reverse('no_project'))
+    print 'Get stats invoked'
+    print 'dir is' + dname
+    print 'ID is ' + bnid
     stat_req = settings.MEDIA_ROOT + dname + '/' + bnid + '/QC/'
     flist = os.listdir(stat_req)
     links = ''
