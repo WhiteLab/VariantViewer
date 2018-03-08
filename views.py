@@ -379,18 +379,16 @@ def manage_status(request, set_viewing_project_pk=None):
 
 @login_required
 def get_stats(request, dname, bnid):
-    # project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
-    # if project_pk is None:
-    #    return HttpResponseRedirect(reverse('no_project'))
-    print 'Get stats invoked'
-    print 'dir is' + dname
-    print 'ID is ' + bnid
+
     stat_req = settings.MEDIA_ROOT + dname + '/' + bnid + '/QC/'
+    print stat_req
     flist = os.listdir(stat_req)
+    print flist
+    ht_link = '/viewer/viewer/media/' + dname + '/' + bnid + '/QC/'
     links = ''
     for fn in flist:
         if fn[-5:] == '.html' or fn[-5:] == '.json':
-            links += '<a href="' + stat_req + fn + '">' + fn + '</a>'
+            links += '<a href="' + ht_link + fn + '">' + fn + '</a><br>'
     return HttpResponse(links)
 
 
