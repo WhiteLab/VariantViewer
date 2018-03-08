@@ -384,7 +384,8 @@ def get_stats(request, dname, bnid):
     print stat_req
     flist = os.listdir(stat_req)
     print flist
-    ht_link = '/viewer/viewer/media/' + dname + '/' + bnid + '/QC/'
+    # ht_link = '/viewer/viewer/media/' + dname + '/' + bnid + '/QC/'
+    ht_link = '/viewer/media/' + dname + '/' + bnid + '/QC/'
     links = ''
     for fn in flist:
         if fn[-5:] == '.html' or fn[-5:] == '.json':
