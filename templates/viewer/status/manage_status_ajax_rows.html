@@ -7,16 +7,14 @@
     <td class="submit-date">{{ s.submit_date }}</td>
     <td class="sequence-date">
         {%if s.status != 'Sample submitted for sequencing' and s.status != 'SEQUENCED' and s.status != 'FAILED QNS'%}
-            <a href="POOP" >{{ s.sequence_date }}</a>
-{#            <a href="{%  url 'get_stats' 'FASTQC' s.bnid.bnid  %}" >{{ s.sequence_date }}</a>#}
+            <a href="{%  url 'manage_project' %}" >{{ s.sequence_date }}</a>
         {% else %}
             <span>{{ s.sequence_date }}</span>
         {%endif%}
     </td>
     <td class="align-date">
         {%if s.status != 'Sample submitted for sequencing' and s.status != 'SEQUENCED' and s.status != 'FAILED QNS'%}
-            <a href="POOP" >{{ s.sequence_date }}</a>
-{#            <a href="{%  url 'get_stats' 'ALIGN' s.bnid.bnid  %}" >{{ s.sequence_date }}</a>#}
+            <a href="{%  url 'manage_project'  %}" >{{ s.sequence_date }}</a>
         {% else %}
             <span>{{ s.align_date }}</span>
         {%endif%}
